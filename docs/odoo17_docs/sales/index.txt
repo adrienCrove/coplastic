@@ -1,0 +1,7 @@
+# Ventes¶
+
+Source: https://www.odoo.com/documentation/17.0/fr/applications/sales/sales.html
+
+---
+
+Ventes ¶ Odoo Ventes est l’application qui vous permet d’exécuter votre processus de vente (du devis à la commande) et de livrer et facturer ce qui a été vendu. Voir aussi Tutoriels Odoo : Tutoriels sur la vente Envoyer des devis Créez des devis. Modèles de devis Produits optionnels Signatures en ligne pour les confirmations de commande Paiement en ligne pour confirmer la commande Dates limites des devis Livrer et facturer à des adresses différentes Variantes de produits sur les devis et les commandes Générateur de devis PDF Méthode de facturation Invoicing policies Acomptes Factures pro forma Facturation basée sur le temps et les matériaux Facturer les jalons d’un projet Produits & Prix Gérez vos produits Importer des produits Variantes de produit Images de produits avec Google Images Gérer vos prix Listes de prix, remises et formules Devises étrangères Retours et remboursements Utiliser des E-wallets et des cartes-cadeaux Programmes de remise et de fidélité Connecteur Amazon Fonctionnalités du Connecteur Amazon Configuration du Connecteur Amazon Gestion des commandes Amazon Connecteur eBay Configuration du connecteur eBay Comment répertorier un produit ? Dépannage du connecteur eBay Associer des annonces existantes Edit on GitHub

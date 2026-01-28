@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Co-Plastic Theme Assets
+
+        Note: Les assets sont déclarés dans le __manifest__.py
+        via le système d'assets Odoo 17.
+
+        Ce fichier est conservé pour référence et compatibilité.
+    -->
+</odoo>

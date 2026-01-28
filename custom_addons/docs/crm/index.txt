@@ -1,0 +1,7 @@
+# CRM¶
+
+Source: https://www.odoo.com/documentation/17.0/fr/applications/sales/crm.html
+
+---
+
+CRM ¶ Odoo CRM vous aide à organiser vos activités de vente : suivez les pistes, concluez les opportunités et obtenez des prévisions précises. Gardez les opportunités organisées grâce au pipeline et gérez vos activités quotidiennes en utilisant les réunions et les prochaines activités. Voir aussi Tutoriels Odoo : CRM Organiser le pipeline Gérer des opportunités perdues Merge similar leads and opportunities Manage sales teams Acquérir des pistes Convertir des pistes en opportunités Create opportunities from web contact forms Create leads (from email or manually) Créer et envoyer des devis Prospection de pistes Assigner et suivre des pistes Assigner des pistes grâce à la notation prédictive des pistes Unattended leads report Quality leads report Revendeurs Marketing attribution reports Lead distribution report Analyser la performance Analyse du pipeline Expected revenue report Forecast report Optimiser votre travail quotidien Enrich contacts with partner autocomplete Ludification CRM Utilize activities for sales teams Enrichissement de pistes Edit on GitHub

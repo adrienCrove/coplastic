@@ -1,0 +1,248 @@
+///
+/// Co-Plastic Theme - Custom Color Variables
+/// Surcharge des variables de couleur Odoo pour correspondre
+/// à l'identité visuelle de Co-Plastic
+///
+
+// =============================================================================
+// COULEURS PRINCIPALES CO-PLASTIC
+// =============================================================================
+
+// Vert Co-Plastic - Couleur principale du logo
+$coplastic-green: #1B7B3D;
+$coplastic-green-dark: #145C2E;
+$coplastic-green-light: #2E9D50;
+
+// Gris - Couleur secondaire
+$coplastic-gray: #6c757d;
+$coplastic-gray-dark: #495057;
+$coplastic-gray-light: #8f8f8f;
+
+// =============================================================================
+// SURCHARGE DES VARIABLES ODOO
+// =============================================================================
+
+// Couleurs de marque
+$o-community-color: $coplastic-green !default;
+$o-brand-odoo: $coplastic-green !default;
+$o-brand-primary: $coplastic-green !default;
+
+// Couleurs secondaires
+$o-brand-secondary: $coplastic-gray !default;
+
+// Couleur d'action (boutons primaires, liens actifs, etc.)
+$o-action: $coplastic-green !default;
+
+// Couleur de succès (alignée avec le vert Co-Plastic)
+$o-success: $coplastic-green !default;
+
+// Couleur des liens
+$o-main-link-color: $coplastic-green-dark !default;
+
+// Bordure des champs requis
+$o-input-border-required: $coplastic-green !default;
+
+// =============================================================================
+// STYLES CSS PERSONNALISÉS
+// =============================================================================
+
+// Variables CSS pour une personnalisation plus fine
+:root {
+    --coplastic-primary: #{$coplastic-green};
+    --coplastic-primary-dark: #{$coplastic-green-dark};
+    --coplastic-primary-light: #{$coplastic-green-light};
+    --coplastic-secondary: #{$coplastic-gray};
+
+    // Surcharge des variables CSS Odoo
+    --o-brand-odoo: #{$coplastic-green};
+    --o-brand-primary: #{$coplastic-green};
+    --primary: #{$coplastic-green};
+    --o-action: #{$coplastic-green};
+    --o-navbar-active-bg: #{$coplastic-green-dark};
+
+    // Variables navbar
+    --NavBar-entry-backgroundColor: #{$coplastic-green-dark};
+    --NavBar-entry-backgroundColor-hover: #{$coplastic-green-dark};
+}
+
+// Surcharge des styles principaux
+.o_main_navbar {
+    background-color: $coplastic-green !important;
+
+    .o_menu_brand {
+        color: white !important;
+    }
+
+    // Menu principal
+    .o_menu_sections > li > a,
+    .o_menu_sections > li > button {
+        color: rgba(255, 255, 255, 0.9) !important;
+
+        &:hover, &:focus {
+            color: white !important;
+            background-color: $coplastic-green-dark !important;
+        }
+
+        // État actif/sélectionné
+        &.active, &:active, &.focus, &.selected, &[aria-expanded="true"] {
+            color: white !important;
+            background-color: $coplastic-green-dark !important;
+        }
+    }
+
+    // Élément de menu actif (page courante)
+    .o_menu_sections > li.active > a,
+    .o_menu_sections > li.active > button,
+    .o_menu_sections > li.show > a,
+    .o_menu_sections > li.show > button,
+    .o_menu_sections > li > a.active,
+    .o_menu_sections > li > button.active {
+        color: white !important;
+        background-color: $coplastic-green-dark !important;
+    }
+
+    // Sous-menus déroulants
+    .o_menu_sections .dropdown-menu {
+        background-color: white;
+        border: 1px solid rgba($coplastic-green, 0.15);
+
+        .dropdown-item {
+            color: $coplastic-gray-dark;
+
+            &:hover, &:focus {
+                background-color: rgba($coplastic-green, 0.1);
+                color: $coplastic-green-dark;
+            }
+
+            &.active, &:active {
+                background-color: $coplastic-green;
+                color: white;
+            }
+        }
+
+        .dropdown-divider {
+            border-color: rgba($coplastic-green, 0.15);
+        }
+    }
+
+    // Menu systray (icônes à droite)
+    .o_menu_systray > li > a,
+    .o_menu_systray > li > button {
+        color: rgba(255, 255, 255, 0.9) !important;
+
+        &:hover, &:focus {
+            color: white !important;
+            background-color: $coplastic-green-dark !important;
+        }
+    }
+}
+
+// Boutons primaires
+.btn-primary {
+    background-color: $coplastic-green !important;
+    border-color: $coplastic-green !important;
+
+    &:hover, &:focus {
+        background-color: $coplastic-green-dark !important;
+        border-color: $coplastic-green-dark !important;
+    }
+
+    &:active, &.active {
+        background-color: $coplastic-green-dark !important;
+        border-color: $coplastic-green-dark !important;
+    }
+}
+
+// Liens
+a {
+    color: $coplastic-green;
+
+    &:hover {
+        color: $coplastic-green-dark;
+    }
+}
+
+// Badges et indicateurs
+// .badge-primary,
+// .bg-primary {
+//     background-color: $coplastic-green !important;
+// }
+
+// .text-primary {
+//     color: $coplastic-green !important;
+// }
+
+// .border-primary {
+//     border-color: $coplastic-green !important;
+// }
+
+// Checkbox et radio buttons
+.form-check-input:checked {
+    background-color: $coplastic-green;
+    border-color: $coplastic-green;
+}
+
+// Focus states
+.form-control:focus,
+.form-select:focus {
+    border-color: $coplastic-green-light;
+    box-shadow: 0 0 0 0.2rem rgba($coplastic-green, 0.25);
+}
+
+// Onglets actifs
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: $coplastic-green;
+}
+
+.nav-tabs .nav-link.active {
+    border-bottom-color: $coplastic-green;
+}
+
+// Pagination
+.page-item.active .page-link {
+    background-color: $coplastic-green;
+    border-color: $coplastic-green;
+}
+
+.page-link {
+    color: $coplastic-green;
+
+    &:hover {
+        color: $coplastic-green-dark;
+    }
+}
+
+// Progress bars
+// .progress-bar {
+//     background-color: $coplastic-green;
+// }
+
+// Dropdown items actifs
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: $coplastic-green;
+}
+
+// Kanban view
+// .o_kanban_view .o_kanban_record.o_kanban_record_has_progress_bar {
+//     .o_kanban_card_header_title {
+//         .o_primary {
+//             color: $coplastic-green;
+//         }
+//     }
+// }
+
+// Selection highlight
+::selection {
+    background-color: rgba($coplastic-green, 0.3);
+}
+
+// Scrollbar (WebKit browsers)
+::-webkit-scrollbar-thumb {
+    background-color: rgba($coplastic-green, 0.5);
+
+    &:hover {
+        background-color: $coplastic-green;
+    }
+}

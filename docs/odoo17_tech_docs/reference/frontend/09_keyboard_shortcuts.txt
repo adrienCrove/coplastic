@@ -1,0 +1,8 @@
+# Keyboard shortcuts¶
+
+Source: https://www.odoo.com/documentation/17.0/applications/essentials/keyboard_shortcuts.html
+Type: Documentation Technique Odoo 17
+
+---
+
+Keyboard shortcuts ¶ Users in Odoo can utilize several keyboard shortcuts to navigate through modules, execute actions, and manage data. Tip Hold Ctrl to view the keyboard shortcuts assigned to each element on the interface. Important Some keyboard shortcuts may not be available on different versions of Odoo or effective depending on browsers, extensions, or other individual settings. Keyboard shortcuts by operating system ¶ Below is a list of some of the most commonly used keyboard shortcuts within Odoo, listed by operating system. Description Windows / Linux macOS Previous breadcrumb Alt + B Ctrl + B Create new record Alt + C Ctrl + C Odoo Home Page Alt + H Ctrl + H Discard changes Alt + J Ctrl + J Save changes Alt + S Ctrl + S Next page Alt + N Ctrl + N Previous page Alt + P Ctrl + P Search Alt + Q Ctrl + Q Select menus Alt + 1 - 9 Ctrl + 1 - 9 Create a new To-Do Alt + Shift + T Ctrl + Shift + T Search a Knowledge article Alt + F Ctrl + F Share a Knowledge article Alt + Shift + S Ctrl + Shift + S Open command palette Ctrl + K Command + K Tip After opening the command palette, search using the following keyboard shortcuts: / : search for menus, applications, and modules. @ : search for users. # : search for Discuss channels. ? : search for Knowledge articles. Enter a name (or term) in the search bar, or use the arrow keys to scroll through the available options. Then, click Ctrl + Enter to open the selected app, module, or menu in a new tab. Edit on GitHub

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_cosplastic_assistant_form" model="ir.ui.view">
+        <field name="name">cosplastic.assistant.form</field>
+        <field name="model">cosplastic.assistant</field>
+        <field name="arch" type="xml">
+            <form string="Assistant IA">
+                <header>
+                    <button name="action_create_assistant"
+                            string="Créer/Configurer l'Assistant"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'configured'"/>
+                    <button name="action_create_assistant"
+                            string="Mettre à jour l'Assistant"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'configured'"/>
+                    <button name="action_upload_documentation"
+                            string="Uploader la Documentation"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not assistant_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,configured"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-file-text-o" disabled="1">
+                            <field name="files_count" string="Fichiers" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de l'assistant"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Configuration">
+                            <field name="assistant_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="model"/>
+                        </group>
+                        <group string="OpenAI">
+                            <field name="assistant_id" readonly="1"/>
+                            <field name="last_sync"/>
+                            <field name="error_message" invisible="not error_message" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Instructions" name="instructions">
+                            <field name="instructions" placeholder="Instructions pour l'assistant IA..."/>
+                        </page>
+                        <page string="Aide" name="help">
+                            <div class="alert alert-info" role="alert">
+                                <h4>Comment configurer l'Assistant IA</h4>
+                                <ol>
+                                    <li><strong>Configurez la clé API OpenAI</strong> dans Paramètres → Paramètres généraux → OdooBot (ChatGPT)</li>
+                                    <li><strong>Choisissez le type d'assistant:</strong>
+                                        <ul>
+                                            <li><strong>Fonctionnel</strong>: Pour les utilisateurs - aide sur les ventes, stocks, factures, CRM</li>
+                                            <li><strong>Technique</strong>: Pour les développeurs - ORM, vues, JavaScript, sécurité</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Cliquez sur "Créer/Configurer l'Assistant"</strong> pour créer l'assistant sur OpenAI</li>
+                                    <li><strong>Cliquez sur "Uploader la Documentation"</strong> pour envoyer la documentation correspondante</li>
+                                    <li><strong>Testez</strong> en posant des questions à OdooBot dans Discuss!</li>
+                                </ol>
+                                <p class="mt-3">
+                                    <strong>Coût estimé :</strong><br/>
+                                    - Upload documentation : ~0.02$<br/>
+                                    - Stockage Vector Store : ~0.10$/GB/jour<br/>
+                                    - Chaque question : ~0.01-0.05$
+                                </p>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_cosplastic_assistant_tree" model="ir.ui.view">
+        <field name="name">cosplastic.assistant.tree</field>
+        <field name="model">cosplastic.assistant</field>
+        <field name="arch" type="xml">
+            <tree string="Assistants IA">
+                <field name="name"/>
+                <field name="assistant_type" widget="badge" decoration-info="assistant_type == 'functional'" decoration-warning="assistant_type == 'technical'"/>
+                <field name="model"/>
+                <field name="state" widget="badge" decoration-success="state == 'configured'" decoration-warning="state == 'draft'" decoration-danger="state == 'error'"/>
+                <field name="files_count"/>
+                <field name="last_sync"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_cosplastic_assistant" model="ir.actions.act_window">
+        <field name="name">Assistant IA</field>
+        <field name="res_model">cosplastic.assistant</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configurez votre Assistant IA
+            </p>
+            <p>
+                Créez un assistant OpenAI alimenté par la documentation Odoo 17 pour aider vos utilisateurs.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_cosplastic_bot_root"
+              name="CoplasticBot"
+              web_icon="cosplastic_bot,static/description/icon.png"
+              sequence="100"/>
+
+    <menuitem id="menu_cosplastic_bot_config"
+              name="Configuration"
+              parent="menu_cosplastic_bot_root"
+              sequence="10"/>
+
+    <menuitem id="menu_cosplastic_assistant"
+              name="Assistant IA"
+              parent="menu_cosplastic_bot_config"
+              action="action_cosplastic_assistant"
+              sequence="10"/>
+
+</odoo>

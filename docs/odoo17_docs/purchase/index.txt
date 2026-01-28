@@ -1,0 +1,7 @@
+# Achat¶
+
+Source: https://www.odoo.com/documentation/17.0/fr/applications/inventory_and_mrp/purchase.html
+
+---
+
+Achat ¶ Odoo Achats vous aide à suivre les conventions d’achat, les devis et les bons de commande. Apprenez à suivre les appels d’offres, à automatiser les réassorts et à suivre vos commandes. Voir aussi Tutoriels Odoo : Achats Produits Import vendor pricelist Configurer des règles de réassort Temporary reordering rules Purchase units of measure Gérer les contrats Demandes de prix Blanket orders Call for tenders Politiques de contrôle des factures Gérer des factures fournisseurs Avancé Purchase Analysis report Vendor costs report Procurement expenses report Edit on GitHub

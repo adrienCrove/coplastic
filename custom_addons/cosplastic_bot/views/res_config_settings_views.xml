@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_coplastic_bot" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.coplastic.bot</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="mail.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Positionner après la section Discuss -->
+            <xpath expr="//block[@id='emails']" position="after">
+                <block title="OdooBot (ChatGPT)" name="coplastic_bot_settings">
+                    <setting string="Configuration OpenAI" help="Connectez OdooBot à ChatGPT pour des réponses intelligentes">
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label for="coplastic_openai_api_key" class="col-lg-3"/>
+                                <field name="coplastic_openai_api_key" class="col-lg-6" password="True" placeholder="sk-..."/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="coplastic_chatgpt_model" class="col-lg-3"/>
+                                <field name="coplastic_chatgpt_model" class="col-lg-6"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="coplastic_max_tokens" class="col-lg-3"/>
+                                <field name="coplastic_max_tokens" class="col-lg-3"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="coplastic_temperature" class="col-lg-3"/>
+                                <field name="coplastic_temperature" class="col-lg-3"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

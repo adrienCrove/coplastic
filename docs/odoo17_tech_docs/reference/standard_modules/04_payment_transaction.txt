@@ -1,0 +1,61 @@
+# Payment Transaction¶
+
+Source: https://www.odoo.com/documentation/17.0/developer/reference/standard_modules/payment/payment_transaction.html
+Type: Documentation Technique Odoo 17
+
+---
+
+Payment Transaction ¶ class odoo.addons.payment.models.payment_transaction. PaymentTransaction [source] ¶ _compute_reference ( provider_code , prefix = None , separator = '-' , ** kwargs ) [source] ¶ Compute a unique reference for the transaction. The reference corresponds to the prefix if no other transaction with that prefix already exists. Otherwise, it follows the pattern {computed_prefix}{separator}{sequence_number} where: {computed_prefix} is: The provided custom prefix, if any. The computation result of _compute_reference_prefix() if the custom prefix is not filled, but the kwargs are. 'tx-{datetime}' if neither the custom prefix nor the kwargs are filled. {separator} is the string that separates the prefix from the sequence number. {sequence_number} is the next integer in the sequence of references sharing the same prefix. The sequence starts with 1 if there is only one matching reference. Example Given the custom prefix 'example' which has no match with an existing reference, the full reference will be 'example' . Given the custom prefix 'example' which matches the existing reference 'example' , and the custom separator '-' , the full reference will be 'example-1' . Given the kwargs {'invoice_ids': [1, 2]} , the custom separator '-' and no custom prefix, the full reference will be 'INV1-INV2' (or similar) if no existing reference has the same prefix, or 'INV1-INV2-n' if n existing references have the same prefix. Parameters provider_code ( str ) – The code of the provider handling the transaction. prefix ( str ) – The custom prefix used to compute the full reference. separator ( str ) – The custom separator used to separate the prefix from the suffix. kwargs ( dict ) – Optional values passed to _compute_reference_prefix() if no custom prefix is provided. Returns The unique reference for the transaction. Return type str _compute_reference_prefix ( provider_code , separator , ** values ) [source] ¶ Compute the reference prefix from the transaction values. Note: This method should be called in sudo mode to give access to the documents (invoices, sales orders) referenced in the transaction values. Parameters provider_code ( str ) – The code of the provider handling the transaction. separator ( str ) – The custom separator used to separate parts of the computed reference prefix. values ( dict ) – The transaction values used to compute the reference prefix. Returns The computed reference prefix. Return type str _get_post_processing_values ( ) [source] ¶ Return a dict of values used to display the status of the transaction. For a provider to handle transaction status display, it must override this method and return a dict of values. Provider-specific values take precedence over those of the dict of generic post-processing values. The returned dict contains the following entries: provider_code : The code of the provider. provider_name : The name of the provider. reference : The reference of the transaction. amount : The rounded amount of the transaction. currency_id : The currency of the transaction, as a res.currency id. state : The transaction state: draft , pending , authorized , done , cancel , or error . state_message : The information message about the state. operation : The operation of the transaction. is_post_processed : Whether the transaction has already been post-processed. landing_route : The route the user is redirected to after the transaction. Additional provider-specific entries. Note: self.ensure_one() Returns The dict of processing values. Return type dict _get_specific_create_values ( provider_code , values ) [source] ¶ Complete the values of the create method with provider-specific values. For a provider to add its own create values, it must overwrite this method and return a dict of values. Provider-specific values take precedence over those of the dict of generic create values. Parameters provider_code ( str ) – The code of the provider that handled the transaction. values ( dict ) – The original create values. Returns The dict of provider-specific create values. Return type dict _get_specific_processing_values ( processing_values ) [source] ¶ Return a dict of provider-specific values used to process the transaction. For a provider to add its own processing values, it must overwrite this method and return a dict of provider-specific values based on the generic values returned by this method. Provider-specific values take precedence over those of the dict of generic processing values. Parameters processing_values ( dict ) – The generic processing values of the transaction. Returns The dict of provider-specific processing values. Return type dict _get_specific_rendering_values ( processing_values ) [source] ¶ Return a dict of provider-specific values used to render the redirect form. For a provider to add its own rendering values, it must overwrite this method and return a dict of provider-specific values based on the processing values (provider-specific processing values included). Parameters processing_values ( dict ) – The processing values of the transaction. Returns The dict of provider-specific rendering values. Return type dict _get_tx_from_notification_data ( provider_code , notification_data ) [source] ¶ Find the transaction based on the notification data. For a provider to handle transaction processing, it must overwrite this method and return the transaction matching the notification data. Parameters provider_code ( str ) – The code of the provider handling the transaction. notification_data ( dict ) – The notification data sent by the provider. Returns The transaction, if found. Return type recordset of payment.transaction _handle_notification_data ( provider_code , notification_data ) [source] ¶ Match the transaction with the notification data, update its state and return it. Parameters provider_code ( str ) – The code of the provider handling the transaction. notification_data ( dict ) – The notification data sent by the provider. Returns The transaction. Return type recordset of payment.transaction _process_notification_data ( notification_data ) [source] ¶ Update the transaction state and the provider reference based on the notification data. This method should usually not be called directly. The correct method to call upon receiving notification data is _handle_notification_data() . For a provider to handle transaction processing, it must overwrite this method and process the notification data. Note: self.ensure_one() Parameters notification_data ( dict ) – The notification data sent by the provider. Returns None _send_capture_request ( amount_to_capture = None ) [source] ¶ Request the provider handling the transaction to capture the payment. For partial captures, create a child transaction linked to the source transaction. For a provider to support authorization, it must override this method and make an API request to capture the payment. Note: self.ensure_one() Parameters amount_to_capture ( float ) – The amount to capture. Returns The created capture child transaction, if any. Return type payment.transaction _send_payment_request ( ) [source] ¶ Request the provider handling the transaction to make the payment. This method is exclusively used to make payments by token, which correspond to both the online_token and the offline transaction’s operation field. For a provider to support tokenization, it must override this method and make an API request to make a payment. Note: self.ensure_one() Returns None _send_refund_request ( amount_to_refund = None ) [source] ¶ Request the provider handling the transaction to refund it. For a provider to support refunds, it must override this method and make an API request to make a refund. Note: self.ensure_one() Parameters amount_to_refund ( float ) – The amount to be refunded. Returns The refund transaction created to process the refund request. Return type recordset of payment.transaction _send_void_request ( amount_to_void = None ) [source] ¶ Request the provider handling the transaction to void the payment. For partial voids, create a child transaction linked to the source transaction. For a provider to support authorization, it must override this method and make an API request to void the payment. Note: self.ensure_one() Parameters amount_to_void ( float ) – The amount to be voided. Returns The created void child transaction, if any. Return type payment.transaction _set_authorized ( state_message = None , extra_allowed_states = () ) [source] ¶ Update the transactions’ state to authorized . Parameters state_message ( str ) – The reason for setting the transactions in the state authorized . extra_allowed_states ( tuple [ str ] ) – The extra states that should be considered allowed target states for the source state ‘authorized’. Returns The updated transactions. Return type recordset of payment.transaction _set_canceled ( state_message = None , extra_allowed_states = () ) [source] ¶ Update the transactions’ state to cancel . Parameters state_message ( str ) – The reason for setting the transactions in the state cancel . extra_allowed_states ( tuple [ str ] ) – The extra states that should be considered allowed target states for the source state ‘canceled’. Returns The updated transactions. Return type recordset of payment.transaction _set_done ( state_message = None , extra_allowed_states = () ) [source] ¶ Update the transactions’ state to done . Parameters state_message ( str ) – The reason for setting the transactions in the state done . extra_allowed_states ( tuple [ str ] ) – The extra states that should be considered allowed target states for the source state ‘done’. Returns The updated transactions. Return type recordset of payment.transaction _set_error ( state_message , extra_allowed_states = () ) [source] ¶ Update the transactions’ state to error . Parameters state_message ( str ) – The reason for setting the transactions in the state error . extra_allowed_states ( tuple [ str ] ) – The extra states that should be considered allowed target states for the source state ‘error’. Returns The updated transactions. Return type recordset of payment.transaction _set_pending ( state_message = None , extra_allowed_states = () ) [source] ¶ Update the transactions’ state to pending . Parameters state_message ( str ) – The reason for setting the transactions in the state pending . extra_allowed_states ( tuple [ str ] ) – The extra states that should be considered allowed target states for the source state ‘pending’. Returns The updated transactions. Return type recordset of payment.transaction Edit on GitHub
+
+--- EXEMPLES DE CODE ---
+
+
+Exemple 1:
+```
+{computed_prefix}{separator}{sequence_number}
+```
+
+Exemple 2:
+```
+{computed_prefix}
+```
+
+Exemple 3:
+```
+_compute_reference_prefix()
+```
+
+Exemple 4:
+```
+'tx-{datetime}'
+```
+
+Exemple 5:
+```
+{separator}
+```
+
+Exemple 6:
+```
+{sequence_number}
+```
+
+Exemple 7:
+```
+'example-1'
+```
+
+Exemple 8:
+```
+{'invoice_ids': [1, 2]}
+```
+
+Exemple 9:
+```
+'INV1-INV2'
+```
+
+Exemple 10:
+```
+'INV1-INV2-n'
+```

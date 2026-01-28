@@ -1,0 +1,61 @@
+# Payment Provider¶
+
+Source: https://www.odoo.com/documentation/17.0/developer/reference/standard_modules/payment/payment_provider.html
+Type: Documentation Technique Odoo 17
+
+---
+
+Payment Provider ¶ class odoo.addons.payment.models.payment_provider. PaymentProvider [source] ¶ _compute_feature_support_fields ( ) [source] ¶ Compute the feature support fields based on the provider. Feature support fields are used to specify which additional features are supported by a given provider. These fields are as follows: support_express_checkout : Whether the “express checkout” feature is supported. False by default. support_manual_capture : Whether the “manual capture” feature is supported. False by default. support_refund : Which type of the “refunds” feature is supported: None , 'full_only' , or 'partial' . None by default. support_tokenization : Whether the “tokenization feature” is supported. False by default. For a provider to specify that it supports additional features, it must override this method and set the related feature support fields to the desired value on the appropriate payment.provider records. Returns None _compute_view_configuration_fields ( ) [source] ¶ Compute the view configuration fields based on the provider. View configuration fields are used to hide specific elements (notebook pages, fields, etc.) from the form view of payment providers. These fields are set to True by default and are as follows: show_credentials_page : Whether the “Credentials” notebook page should be shown. show_allow_tokenization : Whether the allow_tokenization field should be shown. show_allow_express_checkout : Whether the allow_express_checkout field should be shown. show_pre_msg : Whether the pre_msg field should be shown. show_pending_msg : Whether the pending_msg field should be shown. show_auth_msg : Whether the auth_msg field should be shown. show_done_msg : Whether the done_msg field should be shown. show_cancel_msg : Whether the cancel_msg field should be shown. require_currency : Whether the available_currency_ids field shoud be required. For a provider to hide specific elements of the form view, it must override this method and set the related view configuration fields to False on the appropriate payment.provider records. Returns None _get_compatible_providers ( company_id , partner_id , amount , currency_id = None , force_tokenization = False , is_express_checkout = False , is_validation = False , ** kwargs ) [source] ¶ Search and return the providers matching the compatibility criteria. The compatibility criteria are that providers must: not be disabled; be in the company that is provided; support the country of the partner if it exists; be compatible with the currency if provided. If provided, the optional keyword arguments further refine the criteria. Parameters company_id ( int ) – The company to which providers must belong, as a res.company id. partner_id ( int ) – The partner making the payment, as a res.partner id. amount ( float ) – The amount to pay. 0 for validation transactions. currency_id ( int ) – The payment currency, if known beforehand, as a res.currency id. force_tokenization ( bool ) – Whether only providers allowing tokenization can be matched. is_express_checkout ( bool ) – Whether the payment is made through express checkout. is_validation ( bool ) – Whether the operation is a validation. kwargs ( dict ) – Optional data. This parameter is not used here. Returns The compatible providers. Return type payment.provider _get_redirect_form_view ( is_validation = False ) [source] ¶ Return the view of the template used to render the redirect form. For a provider to return a different view depending on whether the operation is a validation, it must override this method and return the appropriate view. Note: self.ensure_one() Parameters is_validation ( bool ) – Whether the operation is a validation. Returns The view of the redirect form template. Return type record of ir.ui.view _get_validation_amount ( ) [source] ¶ Return the amount to use for validation operations. For a provider to support tokenization, it must override this method and return the validation amount. If it is 0 , it is not necessary to create the override. Note: self.ensure_one() Returns The validation amount. Return type float _get_validation_currency ( ) [source] ¶ Return the currency to use for validation operations. The validation currency must be supported by both the provider and the payment method. If the payment method is not passed, only the provider’s supported currencies are considered. If no suitable currency is found, the provider’s company’s currency is returned instead. For a provider to support tokenization and specify a different validation currency, it must override this method and return the appropriate validation currency. Note: self.ensure_one() Returns The validation currency. Return type recordset of res.currency _is_tokenization_required ( ** kwargs ) [source] ¶ Return whether tokenizing the transaction is required given its context. For a module to make the tokenization required based on the payment context, it must override this method and return whether it is required. Parameters kwargs ( dict ) – The payment context. This parameter is not used here. Returns Whether tokenizing the transaction is required. Return type bool _should_build_inline_form ( is_validation = False ) [source] ¶ Return whether the inline payment form should be instantiated. For a provider to handle both direct payments and payments with redirection, it must override this method and return whether the inline payment form should be instantiated (i.e. if the payment should be direct) based on the operation (online payment or validation). Parameters is_validation ( bool ) – Whether the operation is a validation. Returns Whether the inline form should be instantiated. Return type bool _get_removal_values ( ) [source] ¶ Return the values to update a provider with when its module is uninstalled. For a module to specify additional removal values, it must override this method and complete the generic values with its specific values. Returns The removal values to update the removed provider with. Return type dict Edit on GitHub
+
+--- EXEMPLES DE CODE ---
+
+
+Exemple 1:
+```
+support_express_checkout
+```
+
+Exemple 2:
+```
+support_manual_capture
+```
+
+Exemple 3:
+```
+support_refund
+```
+
+Exemple 4:
+```
+'full_only'
+```
+
+Exemple 5:
+```
+support_tokenization
+```
+
+Exemple 6:
+```
+payment.provider
+```
+
+Exemple 7:
+```
+show_credentials_page
+```
+
+Exemple 8:
+```
+show_allow_tokenization
+```
+
+Exemple 9:
+```
+allow_tokenization
+```
+
+Exemple 10:
+```
+show_allow_express_checkout
+```

@@ -1,0 +1,7 @@
+# Employés¶
+
+Source: https://www.odoo.com/documentation/17.0/fr/applications/hr/employees.html
+
+---
+
+Employés ¶ Odoo Employés organise les enregistrements, les contrats et les départements des employés d’une entreprise. Nouveaux employés Départements Certifications Offboarding Employee retention report Edit on GitHub

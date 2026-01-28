@@ -1,0 +1,8 @@
+# User Docs¶
+
+Source: https://www.odoo.com/documentation/17.0/applications.html
+Type: Documentation Technique Odoo 17
+
+---
+
+User Docs ¶ Discover our user guides and configuration tutorials per application. Odoo essentials Activities Reporting Search, filter, and group records Contacts Export and import data In-app purchases (IAP) Keyboard shortcuts Finance Accounting and Invoicing Expenses Online payments Fiscal localizations Sales CRM Sales Point of Sale Subscriptions Rental Members Websites Website eCommerce eLearning Forum Blog Live Chat Supply Chain Inventory Manufacturing Purchase Barcode Quality Maintenance Product lifecycle management Repairs Human resources Attendances Employees Appraisals Frontdesk Fleet Payroll Time Off Recruitment Referrals Lunch Marketing Email Marketing Marketing Automation SMS Marketing Events Surveys Social Marketing Services Project Timesheets Planning Field Service Helpdesk Productivity Documents Sign Spreadsheet Knowledge Calendar Discuss Data Cleaning WhatsApp VoIP (Voice over Internet Protocol) To-do Studio Fields and widgets Views Models, modules, and apps Automation rules PDF reports Approval rules General settings Apps and modules Users Companies Internet of Things (IoT) Communication in Odoo by email Integrations Developer mode (debug mode) Edit on GitHub
