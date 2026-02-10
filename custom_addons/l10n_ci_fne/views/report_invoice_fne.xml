@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Hériter le template de facture pour ajouter le sticker FNE -->
+    <template id="report_invoice_fne_sticker"
+              inherit_id="account.report_invoice_document">
+
+        <!-- Ajouter le bloc FNE après les totaux -->
+        <xpath expr="//div[@id='total']" position="after">
+            <t t-if="o.fne_certified">
+                <div class="row mt-4" style="page-break-inside: avoid;">
+                    <!-- Bloc FNE -->
+                    <div class="col-12">
+                        <div style="border: 2px solid #1a5276; border-radius: 8px; padding: 12px; background-color: #f8f9fa;">
+                            <div class="row">
+                                <!-- Informations FNE -->
+                                <div class="col-8">
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <div style="background-color: #1a5276; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 14px;">
+                                            FNE
+                                        </div>
+                                        <span style="margin-left: 10px; font-size: 11px; color: #555;">
+                                            Facture Normalisée Électronique - DGI Côte d'Ivoire
+                                        </span>
+                                    </div>
+                                    <table style="font-size: 11px; width: 100%;">
+                                        <tr>
+                                            <td style="padding: 2px 8px 2px 0; font-weight: bold; width: 160px;">Référence FNE :</td>
+                                            <td style="padding: 2px 0;">
+                                                <span t-field="o.fne_reference"
+                                                      style="font-family: monospace; font-size: 12px; font-weight: bold; color: #1a5276;"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 8px 2px 0; font-weight: bold;">NCC :</td>
+                                            <td style="padding: 2px 0;">
+                                                <span t-field="o.fne_ncc"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 8px 2px 0; font-weight: bold;">Date certification :</td>
+                                            <td style="padding: 2px 0;">
+                                                <span t-field="o.fne_certification_date"
+                                                      t-options='{"format": "dd/MM/yyyy HH:mm"}'/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!-- QR Code -->
+                                <div class="col-4 text-end">
+                                    <t t-if="o.fne_qr_code">
+                                        <img t-att-src="image_data_uri(o.fne_qr_code)"
+                                             style="width: 120px; height: 120px;"
+                                             alt="QR Code FNE"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <!-- Lien de vérification -->
+                            <div t-if="o.fne_token"
+                                 style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 9px; color: #777; text-align: center;">
+                                Vérification : <span t-field="o.fne_token"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+
+    </template>
+
+</odoo>

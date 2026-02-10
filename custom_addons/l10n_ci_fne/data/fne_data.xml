@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Valeurs par défaut pour la configuration FNE -->
+        <record id="default_fne_api_url" model="ir.config_parameter">
+            <field name="key">l10n_ci_fne.api_url</field>
+            <field name="value">http://54.247.95.108/ws</field>
+        </record>
+
+        <record id="default_fne_environment" model="ir.config_parameter">
+            <field name="key">l10n_ci_fne.environment</field>
+            <field name="value">test</field>
+        </record>
+
+        <record id="default_fne_auto_certify" model="ir.config_parameter">
+            <field name="key">l10n_ci_fne.auto_certify</field>
+            <field name="value">True</field>
+        </record>
+
+        <record id="default_fne_point_of_sale" model="ir.config_parameter">
+            <field name="key">l10n_ci_fne.point_of_sale</field>
+            <field name="value">1</field>
+        </record>
+
+    </data>
+</odoo>

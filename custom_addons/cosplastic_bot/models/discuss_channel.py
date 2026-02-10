@@ -63,6 +63,11 @@ class DiscussChannel(models.Model):
         body = kwargs.get('body', '')
         self._post_bot_message("produit", body)
 
+    def execute_command_tech(self, **kwargs):
+        """Commande /tech - Questions techniques développement Odoo"""
+        body = kwargs.get('body', '')
+        self._post_bot_message("tech", body)
+
     @api.model
     def _get_available_commands(self):
         """Ajoute les commandes CoplasticBot aux commandes disponibles"""
@@ -97,6 +102,10 @@ class DiscussChannel(models.Model):
             {
                 'name': 'produit',
                 'help': _("Recherche un produit"),
+            },
+            {
+                'name': 'tech',
+                'help': _("Questions techniques (développement Odoo)"),
             },
         ]
 
