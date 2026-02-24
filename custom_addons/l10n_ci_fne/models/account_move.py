@@ -62,6 +62,13 @@ class AccountMove(models.Model):
         readonly=True,
         copy=False,
     )
+    fne_simulation = fields.Boolean(
+        string="Certification simulation",
+        readonly=True,
+        copy=False,
+        default=False,
+        help="Indique que la certification a été faite en mode simulation (non envoyée à la DGI)"
+    )
 
     @api.depends('fne_token')
     def _compute_fne_qr_code(self):
@@ -101,7 +108,7 @@ class AccountMove(models.Model):
 
         # Vérifier si la certification auto est activée
         ICP = self.env['ir.config_parameter'].sudo()
-        auto_certify = ICP.get_param('l10n_ci_fne.auto_certify', 'True')
+        auto_certify = ICP.get_param('l10n_ci_fne.auto_certify', 'False')
 
         if auto_certify == 'True':
             for move in posted:
@@ -148,6 +155,7 @@ class AccountMove(models.Model):
                 'fne_balance_sticker': result.get('balance_sticker', 0),
                 'fne_invoice_id': invoice_data.get('id', ''),
                 'fne_certified': True,
+                'fne_simulation': result.get('simulation', False),
                 'fne_certification_date': fields.Datetime.now(),
                 'fne_error_message': False,
             })
@@ -167,8 +175,26 @@ class AccountMove(models.Model):
                 'title': _('Succès'),
                 'message': _('Facture certifiée FNE: %s') % self.fne_reference,
                 'type': 'success',
+                'next': {'type': 'ir.actions.act_window_close'},
             }
         }
+
+    def action_fne_reset_simulation(self):
+        """Réinitialise la certification simulation pour permettre une vraie certification"""
+        self.ensure_one()
+        if not self.fne_simulation:
+            raise UserError(_("Cette facture n'a pas été certifiée en mode simulation."))
+        self.write({
+            'fne_reference': False,
+            'fne_token': False,
+            'fne_ncc': False,
+            'fne_balance_sticker': 0,
+            'fne_invoice_id': False,
+            'fne_certified': False,
+            'fne_simulation': False,
+            'fne_certification_date': False,
+            'fne_error_message': False,
+        })
 
 
 class AccountMoveLine(models.Model):

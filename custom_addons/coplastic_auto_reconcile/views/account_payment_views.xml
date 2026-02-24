@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_payment_form_auto_reconcile" model="ir.ui.view">
+        <field name="name">account.payment.form.auto_reconcile</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="show_manual_reconcile_button" invisible="1"/>
+                <field name="auto_reconcile_move_id" invisible="1"/>
+
+                <!-- Smart button : voir l'écriture de rapprochement -->
+                <button name="action_open_reconcile_move"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-exchange"
+                        invisible="not auto_reconcile_move_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Rapprochement</span>
+                    </div>
+                </button>
+
+                <!-- Bouton : rapprochement manuel -->
+                <button name="action_manual_reconcile"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-check-circle"
+                        invisible="not show_manual_reconcile_button">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Rapprocher</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

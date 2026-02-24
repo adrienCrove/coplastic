@@ -1,0 +1,6 @@
+- par defaut, la date d'expiration d'un devis est sur une plage de 2 Semaines (cosplactic_so)
+- ajout de 60 et 90 jours comme condition de paiment (cosplactic_so)
+- Voir si un bon de commande peut generer plusieurs bon de livraison
+- aucune saisie ne peu etre supprimer sans accord de l'administrateur
+- des que nous sommes à l'etat don de commande, les lignes de devis apparaissent en lecture seul l'admin peut modifier les les lignes (cosplactic_so)
+- Ajouter un champ qui recupere la date avec heure de la derniere impression du bon de livraison validé(cosplactic_stock)

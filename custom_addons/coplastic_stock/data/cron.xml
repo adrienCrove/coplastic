@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_cron_stock_alert" model="ir.cron">
+        <field name="name">Coplastic : Alerte stock quotidienne</field>
+        <field name="model_id" ref="model_coplastic_stock_alert"/>
+        <field name="state">code</field>
+        <field name="code">model._check_stock_levels()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">1</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 07:00:00')"/>
+    </record>
+
+</odoo>

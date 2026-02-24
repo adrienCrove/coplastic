@@ -37,10 +37,10 @@ class FneApiService(models.AbstractModel):
             'api_key': ICP.get_param('l10n_ci_fne.api_key', ''),
             'api_url': ICP.get_param('l10n_ci_fne.api_url', ''),
             'ncc': ICP.get_param('l10n_ci_fne.ncc', ''),
-            'environment': ICP.get_param('l10n_ci_fne.environment', 'test'),
             'point_of_sale': ICP.get_param('l10n_ci_fne.point_of_sale', '1'),
             'establishment': ICP.get_param('l10n_ci_fne.establishment', ''),
-            'auto_certify': ICP.get_param('l10n_ci_fne.auto_certify', 'True'),
+            'auto_certify': ICP.get_param('l10n_ci_fne.auto_certify', 'False'),
+            'simulation': ICP.get_param('l10n_ci_fne.simulation', 'True'),
         }
         return config
 
@@ -81,7 +81,7 @@ class FneApiService(models.AbstractModel):
     def _prepare_invoice_items(self, invoice):
         """Prépare les lignes de facture au format FNE"""
         items = []
-        for line in invoice.invoice_line_ids.filtered(lambda l: not l.display_type):
+        for line in invoice.invoice_line_ids.filtered(lambda l: l.display_type == 'product'):
             # Déterminer les taxes
             taxes = []
             custom_taxes = []
@@ -158,7 +158,30 @@ class FneApiService(models.AbstractModel):
     def certify_invoice(self, invoice):
         """Certifie une facture auprès de la plateforme FNE"""
         config = self._get_config()
+        payload = self._prepare_invoice_payload(invoice)
 
+        # === MODE SIMULATION ===
+        if config.get('simulation') == 'True':
+            _logger.info(
+                "FNE [SIMULATION]: Facture %s - Requête préparée (non envoyée)",
+                invoice.name
+            )
+            _logger.info(
+                "FNE [SIMULATION]: Payload:\n%s",
+                json.dumps(payload, indent=2, ensure_ascii=False)
+            )
+            # Retourner des données fictives pour tester le flux
+            return {
+                'success': True,
+                'reference': 'SIM-%s' % invoice.name,
+                'token': '',
+                'ncc': config.get('ncc', ''),
+                'balance_sticker': 0,
+                'invoice_data': {'id': 'simulation'},
+                'simulation': True,
+            }
+
+        # === MODE PRODUCTION ===
         if not config.get('api_key'):
             raise UserError(_(
                 "Clé API FNE non configurée. "
@@ -173,12 +196,10 @@ class FneApiService(models.AbstractModel):
 
         api_url = config['api_url'].rstrip('/')
         endpoint = f"{api_url}/external/invoices/sign"
-
-        payload = self._prepare_invoice_payload(invoice)
         headers = self._get_headers(config['api_key'])
 
         _logger.info("FNE: Certification facture %s - Endpoint: %s", invoice.name, endpoint)
-        _logger.debug("FNE: Payload: %s", json.dumps(payload, indent=2))
+        _logger.info("FNE: Payload:\n%s", json.dumps(payload, indent=2, ensure_ascii=False))
 
         try:
             response = requests.post(
@@ -248,7 +269,7 @@ class FneApiService(models.AbstractModel):
 
         # Préparer les items pour l'avoir
         items = []
-        for line in invoice.invoice_line_ids.filtered(lambda l: not l.display_type):
+        for line in invoice.invoice_line_ids.filtered(lambda l: l.display_type == 'product'):
             # On a besoin de l'id FNE de l'item original
             # Pour simplifier, on envoie la quantité retournée
             items.append({

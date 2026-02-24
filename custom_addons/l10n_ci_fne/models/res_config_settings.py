@@ -15,21 +15,12 @@ class ResConfigSettings(models.TransientModel):
     l10n_ci_fne_api_url = fields.Char(
         string="URL API FNE",
         config_parameter='l10n_ci_fne.api_url',
-        default='http://54.247.95.108/ws',
-        help="URL de l'API FNE (test ou production)"
+        help="URL de l'API FNE fournie par la DGI"
     )
     l10n_ci_fne_ncc = fields.Char(
         string="NCC Entreprise",
         config_parameter='l10n_ci_fne.ncc',
         help="Numéro de Compte Contribuable de votre entreprise"
-    )
-    l10n_ci_fne_environment = fields.Selection([
-        ('test', 'Test'),
-        ('production', 'Production'),
-    ],
-        string="Environnement",
-        config_parameter='l10n_ci_fne.environment',
-        default='test',
     )
     l10n_ci_fne_point_of_sale = fields.Char(
         string="Point de vente",
@@ -45,6 +36,14 @@ class ResConfigSettings(models.TransientModel):
     l10n_ci_fne_auto_certify = fields.Boolean(
         string="Certification automatique",
         config_parameter='l10n_ci_fne.auto_certify',
+        default=False,
+        help="Certifier automatiquement les factures lors de la validation. "
+             "ATTENTION : chaque certification consomme un sticker FNE."
+    )
+    l10n_ci_fne_simulation = fields.Boolean(
+        string="Mode simulation",
+        config_parameter='l10n_ci_fne.simulation',
         default=True,
-        help="Certifier automatiquement les factures lors de la validation"
+        help="En mode simulation, les requêtes sont préparées et loguées "
+             "mais PAS envoyées à la DGI. Utile pour vérifier les données avant la mise en production."
     )

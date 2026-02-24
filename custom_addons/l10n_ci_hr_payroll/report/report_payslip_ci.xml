@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Action de rapport bulletin CI -->
+    <record id="action_report_payslip_ci" model="ir.actions.report">
+        <field name="name">Bulletin de Paie CI</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ci_hr_payroll.report_payslip_ci</field>
+        <field name="report_file">l10n_ci_hr_payroll.report_payslip_ci</field>
+        <field name="binding_model_id" ref="payroll.model_hr_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Template principal -->
+    <template id="report_payslip_ci">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-size: 10px;">
+
+                        <!-- EN-TÊTE : Titre BULLETIN DE PAIE -->
+                        <div class="row mb-3">
+                            <div class="col-7">
+                                <!-- Infos entreprise (déjà dans external_layout) -->
+                            </div>
+                            <div class="col-5 text-end">
+                                <h2 style="font-weight: bold;">BULLETIN DE PAIE</h2>
+                                <table class="table table-sm table-borderless" style="font-size: 10px;">
+                                    <tr>
+                                        <td>Période du</td>
+                                        <td class="text-end"><strong><t t-esc="o.date_from" t-options='{"widget": "date"}'/></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>au</td>
+                                        <td class="text-end"><strong><t t-esc="o.date_to" t-options='{"widget": "date"}'/></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Paiement le</td>
+                                        <td class="text-end"><t t-esc="o.date_to" t-options='{"widget": "date"}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>par</td>
+                                        <td class="text-end">Virement</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ZONE EMPLOYÉ -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <table class="table table-sm table-bordered" style="font-size: 9px;">
+                                    <tr>
+                                        <td><strong>Matricule</strong></td>
+                                        <td><t t-esc="o.employee_id.l10n_ci_matricule or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>N° C.N.P.S.</strong></td>
+                                        <td><t t-esc="o.employee_id.l10n_ci_cnps_number or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Ancienneté</strong></td>
+                                        <td>
+                                            <t t-if="o.employee_id.first_contract_date">
+                                                <t t-set="delta" t-value="(o.date_to - o.employee_id.first_contract_date)"/>
+                                                <t t-set="years" t-value="delta.days // 365"/>
+                                                <t t-set="months" t-value="(delta.days % 365) // 30"/>
+                                                <t t-esc="years"/> an(s) et <t t-esc="months"/> mois
+                                            </t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Emploi</strong></td>
+                                        <td><t t-esc="o.employee_id.job_id.name or o.employee_id.job_title or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Qualification</strong></td>
+                                        <td><t t-esc="dict(o.employee_id._fields['l10n_ci_qualification'].selection).get(o.employee_id.l10n_ci_qualification, '') if o.employee_id.l10n_ci_qualification else ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Département</strong></td>
+                                        <td><t t-esc="o.employee_id.department_id.name or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Catégorie</strong></td>
+                                        <td><t t-esc="o.employee_id.l10n_ci_categorie or ''"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-bordered" style="font-size: 9px;">
+                                    <tr>
+                                        <td colspan="2" class="text-center" style="background-color: #f0f0f0;">
+                                            <strong><t t-esc="o.employee_id.name"/></strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Parts I.G.R.</strong></td>
+                                        <td><t t-esc="'%.2f' % (o.employee_id.l10n_ci_parts_igr or 1.0)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nb. Enfants</strong></td>
+                                        <td><t t-esc="'%.2f' % (o.employee_id.l10n_ci_nb_children or 0)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Embauche</strong></td>
+                                        <td><t t-esc="o.employee_id.first_contract_date" t-options='{"widget": "date"}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Horaire</strong></td>
+                                        <td><t t-esc="'%.2f' % (o.contract_id.l10n_ci_horaire_mensuel or 173.33)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>N° de compte</strong></td>
+                                        <td><t t-esc="o.employee_id.l10n_ci_bank_account or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Banque</strong></td>
+                                        <td><t t-esc="o.employee_id.l10n_ci_bank_name or ''"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TABLEAU DES LIGNES DE PAIE -->
+                        <table class="table table-sm table-bordered" style="font-size: 9px;">
+                            <thead style="background-color: #e8e8e8;">
+                                <tr>
+                                    <th rowspan="2" style="width: 5%;">N°</th>
+                                    <th rowspan="2" style="width: 25%;">Désignation</th>
+                                    <th rowspan="2" style="width: 7%;">Nombre</th>
+                                    <th rowspan="2" style="width: 12%;">Base</th>
+                                    <th rowspan="2" style="width: 6%;">Taux</th>
+                                    <th colspan="2" class="text-center" style="width: 22%;">Part salariale</th>
+                                    <th colspan="2" class="text-center" style="width: 22%;">Part patronale</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center">Gain</th>
+                                    <th class="text-center">Retenue</th>
+                                    <th class="text-center">Taux</th>
+                                    <th class="text-center">Retenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids.sorted(key=lambda l: l.sequence)" t-as="line">
+                                    <t t-if="line.appears_on_payslip and line.total != 0">
+                                        <t t-set="is_brut" t-value="line.category_id.code == 'CI_BRUT'"/>
+                                        <t t-set="is_cotis_sal" t-value="line.category_id.code == 'CI_COT_SAL'"/>
+                                        <t t-set="is_cotis_pat" t-value="line.category_id.code == 'CI_COT_PAT'"/>
+                                        <t t-set="is_avt" t-value="line.category_id.code == 'CI_AVT'"/>
+                                        <t t-set="is_net" t-value="line.category_id.code == 'CI_NET'"/>
+                                        <t t-set="is_total" t-value="line.code in ('CI_BRUT_TOTAL', 'CI_TOT_COT_SAL', 'CI_TOT_COT_PAT', 'CI_NET')"/>
+
+                                        <tr t-att-style="'font-weight: bold; background-color: #f5f5f5;' if is_total else ''">
+                                            <!-- N° (code) -->
+                                            <td><t t-if="not is_total"><t t-esc="line.code"/></t></td>
+                                            <!-- Désignation -->
+                                            <td><t t-esc="line.name"/></td>
+                                            <!-- Nombre (quantity si != 1) -->
+                                            <td class="text-end">
+                                                <t t-if="line.quantity != 1.0 and not is_total">
+                                                    <t t-esc="'%.2f' % line.quantity"/>
+                                                </t>
+                                            </td>
+                                            <!-- Base -->
+                                            <td class="text-end">
+                                                <t t-if="not is_total and not is_net">
+                                                    <t t-if="line.amount != 0">
+                                                        <t t-esc="'{:,.0f}'.format(abs(line.amount)).replace(',', ' ')"/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <!-- Taux salarié -->
+                                            <td class="text-end">
+                                                <t t-if="line.rate != 100 and not is_total">
+                                                    <t t-esc="'%.2f' % line.rate"/>
+                                                </t>
+                                            </td>
+                                            <!-- Gain salarié -->
+                                            <td class="text-end">
+                                                <t t-if="(is_brut or is_avt or is_net) and line.total &gt; 0">
+                                                    <t t-esc="'{:,.0f}'.format(line.total).replace(',', ' ')"/>
+                                                </t>
+                                            </td>
+                                            <!-- Retenue salarié -->
+                                            <td class="text-end">
+                                                <t t-if="is_cotis_sal or (line.total &lt; 0 and not is_cotis_pat)">
+                                                    <t t-esc="'{:,.0f}'.format(abs(line.total)).replace(',', ' ')"/>
+                                                </t>
+                                            </td>
+                                            <!-- Taux patronal -->
+                                            <td class="text-end">
+                                                <t t-if="is_cotis_pat and not is_total and line.rate != 100">
+                                                    <t t-esc="'%.2f' % line.rate"/>
+                                                </t>
+                                            </td>
+                                            <!-- Retenue patronal -->
+                                            <td class="text-end">
+                                                <t t-if="is_cotis_pat">
+                                                    <t t-esc="'{:,.0f}'.format(abs(line.total)).replace(',', ' ')"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- NET A PAYER en gros -->
+                        <t t-set="net_line" t-value="o.line_ids.filtered(lambda l: l.code == 'CI_NET')"/>
+                        <div class="row mt-3" t-if="net_line">
+                            <div class="col-8"/>
+                            <div class="col-4">
+                                <table class="table table-bordered">
+                                    <tr style="background-color: #003366; color: white; font-size: 14px; font-weight: bold;">
+                                        <td>NET A PAYER</td>
+                                        <td class="text-end">
+                                            <t t-esc="'{:,.0f}'.format(net_line[0].total).replace(',', ' ')"/> CFA
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ZONE CUMULS -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <table class="table table-sm table-bordered" style="font-size: 8px;">
+                                    <thead style="background-color: #e8e8e8;">
+                                        <tr>
+                                            <th>Cumuls</th>
+                                            <th class="text-end">Salaire brut</th>
+                                            <th class="text-end">Charges salariales</th>
+                                            <th class="text-end">Charges patronales</th>
+                                            <th class="text-end">Net Imposable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="brut_line" t-value="o.line_ids.filtered(lambda l: l.code == 'CI_BRUT_TOTAL')"/>
+                                        <t t-set="cotis_sal_line" t-value="o.line_ids.filtered(lambda l: l.code == 'CI_TOT_COT_SAL')"/>
+                                        <t t-set="cotis_pat_line" t-value="o.line_ids.filtered(lambda l: l.code == 'CI_TOT_COT_PAT')"/>
+                                        <tr>
+                                            <td><strong>Période</strong></td>
+                                            <td class="text-end"><t t-if="brut_line"><t t-esc="'{:,.0f}'.format(brut_line[0].total).replace(',', ' ')"/></t></td>
+                                            <td class="text-end"><t t-if="cotis_sal_line"><t t-esc="'{:,.0f}'.format(abs(cotis_sal_line[0].total)).replace(',', ' ')"/></t></td>
+                                            <td class="text-end"><t t-if="cotis_pat_line"><t t-esc="'{:,.0f}'.format(cotis_pat_line[0].total).replace(',', ' ')"/></t></td>
+                                            <td class="text-end"><t t-if="brut_line"><t t-esc="'{:,.0f}'.format(brut_line[0].total).replace(',', ' ')"/></t></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

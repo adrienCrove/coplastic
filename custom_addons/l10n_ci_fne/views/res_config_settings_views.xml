@@ -12,13 +12,9 @@
                              help="Paramètres de connexion à la plateforme FNE de la DGI Côte d'Ivoire">
                         <div class="content-group">
                             <div class="row mt16">
-                                <label for="l10n_ci_fne_environment" class="col-3 col-lg-3 o_light_label"/>
-                                <field name="l10n_ci_fne_environment" widget="radio"
-                                       options="{'horizontal': true}"/>
-                            </div>
-                            <div class="row mt8">
                                 <label for="l10n_ci_fne_api_url" class="col-3 col-lg-3 o_light_label"/>
-                                <field name="l10n_ci_fne_api_url" class="col-5"/>
+                                <field name="l10n_ci_fne_api_url" class="col-5"
+                                       placeholder="URL fournie par la DGI"/>
                             </div>
                             <div class="row mt8">
                                 <label for="l10n_ci_fne_api_key" class="col-3 col-lg-3 o_light_label"/>
@@ -46,8 +42,16 @@
                             </div>
                         </div>
                     </setting>
+                    <setting string="Mode simulation"
+                             help="Prépare les requêtes sans les envoyer à la DGI. Les données sont loguées pour vérification.">
+                        <field name="l10n_ci_fne_simulation"/>
+                        <div class="text-warning mt8" style="font-size: 12px;">
+                            Désactivez le mode simulation uniquement quand vous êtes prêt
+                            à envoyer de vraies factures à la DGI.
+                        </div>
+                    </setting>
                     <setting string="Certification automatique"
-                             help="Certifier automatiquement les factures validées auprès de la DGI">
+                             help="Certifier automatiquement les factures validées. ATTENTION : chaque certification consomme un sticker FNE.">
                         <field name="l10n_ci_fne_auto_certify"/>
                     </setting>
                 </block>

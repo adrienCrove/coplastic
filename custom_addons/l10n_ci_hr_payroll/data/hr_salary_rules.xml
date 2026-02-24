@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+
+    <!-- ============================================================ -->
+    <!-- 0. JOURS TRAVAILLÉS (convention CI : 30 jours/mois)          -->
+    <!--    Utilise le planning horaire employé pour détecter          -->
+    <!--    automatiquement les absences                               -->
+    <!-- ============================================================ -->
+
+    <record id="rule_ci_jours" model="hr.salary.rule">
+        <field name="name">Jours travaillés</field>
+        <field name="code">CI_JOURS</field>
+        <field name="sequence" eval="0"/>
+        <field name="category_id" ref="ci_categ_brut"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs.CI_JOURS_TRAV and inputs.CI_JOURS_TRAV.amount > 0:
+    result = inputs.CI_JOURS_TRAV.amount
+else:
+    total_ouvrables = sum(line.number_of_days for line in payslip.worked_days_line_ids)
+    jours_work = worked_days.WORK100.number_of_days if worked_days.WORK100 else total_ouvrables
+    absences = max(0, total_ouvrables - jours_work)
+    result = max(0, 30 - absences)
+result_qty = 1.0
+        </field>
+        <field name="appears_on_payslip" eval="False"/>
+        <field name="note">Jours payés (convention 30j/mois). Auto-calculé via le planning 40h/sem ou saisie manuelle CI_JOURS_TRAV.</field>
+    </record>
+
+    <!-- Input pour override manuel des jours travaillés -->
+    <record id="rule_input_jours_trav" model="hr.rule.input">
+        <field name="name">Jours travaillés (sur 30) - override</field>
+        <field name="code">CI_JOURS_TRAV</field>
+        <field name="input_id" ref="rule_ci_jours"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 1. GAINS - Éléments du salaire brut                          -->
+    <!-- ============================================================ -->
+
+    <!-- 1010 - Salaire de base catégoriel -->
+    <record id="rule_ci_base" model="hr.salary.rule">
+        <field name="name">Salaire de base catégoriel</field>
+        <field name="code">CI_BASE</field>
+        <field name="sequence" eval="1"/>
+        <field name="category_id" ref="ci_categ_brut"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Convention CI : salaire proratisé sur 30 jours
+# Utilise les jours calculés depuis le planning horaire
+jours = result_rules.CI_JOURS.total
+result = contract.wage * jours / 30
+result_qty = 1.0
+        </field>
+        <field name="note">Salaire de base catégoriel proratisé : wage × jours / 30 (basé sur planning horaire).</field>
+    </record>
+
+    <!-- 1060 - Sursalaire -->
+    <record id="rule_ci_sursalaire" model="hr.salary.rule">
+        <field name="name">Sursalaire</field>
+        <field name="code">CI_SURS</field>
+        <field name="sequence" eval="2"/>
+        <field name="category_id" ref="ci_categ_brut"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.l10n_ci_sursalaire &gt; 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+jours = result_rules.CI_JOURS.total
+result = contract.l10n_ci_sursalaire * jours / 30
+result_qty = 1.0
+        </field>
+        <field name="note">Complément salarial proratisé sur les jours travaillés.</field>
+    </record>
+
+    <!-- 1320 - Prime d'ancienneté -->
+    <record id="rule_ci_anciennete" model="hr.salary.rule">
+        <field name="name">Prime d'ancienneté</field>
+        <field name="code">CI_ANC</field>
+        <field name="sequence" eval="3"/>
+        <field name="category_id" ref="ci_categ_brut"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.l10n_ci_taux_anciennete &gt; 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Prime d'ancienneté = taux% × salaire de base (déjà proratisé)
+base = result_rules.CI_BASE.total
+result = base * contract.l10n_ci_taux_anciennete / 100
+result_qty = 1.0
+        </field>
+        <field name="note">Convention CI : 2% par an après 2 ans d'ancienneté, plafonné à 25%.</field>
+    </record>
+
+    <!-- 2090 - Allocation congé payés -->
+    <record id="rule_ci_conge" model="hr.salary.rule">
+        <field name="name">Allocation congé payés</field>
+        <field name="code">CI_CONG</field>
+        <field name="sequence" eval="4"/>
+        <field name="category_id" ref="ci_categ_brut"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_ci_indemnite_conge and contract.l10n_ci_indemnite_conge &gt; 0
+        </field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Jours de congé = 30 - jours travaillés
+jours_trav = result_rules.CI_JOURS.total
+jours_conge = max(0, 30 - jours_trav)
+# Override par input spécifique si renseigné
+if inputs.CI_JOURS_CONGE and inputs.CI_JOURS_CONGE.amount &gt; 0:
+    jours_conge = inputs.CI_JOURS_CONGE.amount
+result = contract.l10n_ci_indemnite_conge * jours_conge if jours_conge &gt; 0 else 0
+result_qty = 1.0
+        </field>
+        <field name="note">Indemnité de congé payé = indemnité journalière × jours de congé.</field>
+    </record>
+
+    <!-- Input pour jours de congé manuels -->
+    <record id="rule_input_jours_conge" model="hr.rule.input">
+        <field name="name">Jours de congé payés</field>
+        <field name="code">CI_JOURS_CONGE</field>
+        <field name="input_id" ref="rule_ci_conge"/>
+    </record>
+
+    <!-- TOTAL BRUT -->
+    <record id="rule_ci_brut" model="hr.salary.rule">
+        <field name="name">Total Brut</field>
+        <field name="code">CI_BRUT_TOTAL</field>
+        <field name="sequence" eval="10"/>
+        <field name="category_id" ref="ci_categ_brut"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories.CI_BRUT
+        </field>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="note">Somme de tous les éléments du salaire brut.</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 2. COTISATIONS SALARIALES                                     -->
+    <!-- ============================================================ -->
+
+    <!-- 5200 - Retraite CNPS (salarié) - 6.30% -->
+    <record id="rule_ci_retraite_sal" model="hr.salary.rule">
+        <field name="name">Régime de Retraite (salarié)</field>
+        <field name="code">CI_RET_SAL</field>
+        <field name="sequence" eval="20"/>
+        <field name="category_id" ref="ci_categ_cotis_sal"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Retraite CNPS salarié : 6.30% du brut
+# Plafond CNPS retraite : 45 × SMIG = 45 × 75 000 = 3 375 000 FCFA/mois
+brut = categories.CI_BRUT
+base = min(brut, 3375000)
+result = -base * 6.30 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_cnps"/>
+        <field name="note">Cotisation retraite CNPS part salarié : 6.30% du brut (plafond 3 375 000 FCFA).</field>
+    </record>
+
+    <!-- 5000 - ITS mensuel -->
+    <record id="rule_ci_its" model="hr.salary.rule">
+        <field name="name">ITS mensuel</field>
+        <field name="code">CI_ITS</field>
+        <field name="sequence" eval="21"/>
+        <field name="category_id" ref="ci_categ_cotis_sal"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Calcul ITS via la méthode du modèle hr.payslip
+brut = categories.CI_BRUT
+parts = employee.l10n_ci_parts_igr or 1.0
+# Brut imposable annuel (brut mensuel × 12)
+brut_annuel = brut * 12
+its_mensuel = payslip._l10n_ci_compute_its(brut_annuel, parts)
+result = -its_mensuel
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_its"/>
+        <field name="note">Impôt sur Traitements et Salaires - barème progressif CI avec quotient familial.</field>
+    </record>
+
+    <!-- 5650 - CMU salarié (500 FCFA fixe) -->
+    <record id="rule_ci_cmu_sal" model="hr.salary.rule">
+        <field name="name">Prélèvement CMU (salarié)</field>
+        <field name="code">CI_CMU_SAL</field>
+        <field name="sequence" eval="22"/>
+        <field name="category_id" ref="ci_categ_cotis_sal"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">fix</field>
+        <field name="amount_fix" eval="-500"/>
+        <field name="register_id" ref="contrib_register_cmu"/>
+        <field name="note">Couverture Maladie Universelle - part salarié : 500 FCFA fixe.</field>
+    </record>
+
+    <!-- TOTAL COTISATIONS SALARIALES -->
+    <record id="rule_ci_total_cotis_sal" model="hr.salary.rule">
+        <field name="name">Total Cotisations salariales</field>
+        <field name="code">CI_TOT_COT_SAL</field>
+        <field name="sequence" eval="29"/>
+        <field name="category_id" ref="ci_categ_cotis_sal"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories.CI_COT_SAL
+        </field>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 3. COTISATIONS PATRONALES                                     -->
+    <!-- ============================================================ -->
+
+    <!-- 5200 - Retraite CNPS (patronal) - 7.70% -->
+    <record id="rule_ci_retraite_pat" model="hr.salary.rule">
+        <field name="name">Régime de Retraite (patronal)</field>
+        <field name="code">CI_RET_PAT</field>
+        <field name="sequence" eval="30"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+brut = categories.CI_BRUT
+base = min(brut, 3375000)
+result = base * 7.70 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_cnps"/>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="note">Cotisation retraite CNPS part patronale : 7.70% du brut (plafond 3 375 000 FCFA).</field>
+    </record>
+
+    <!-- 5400 - ITS Exploitation Patronal - 10.40% -->
+    <record id="rule_ci_its_pat" model="hr.salary.rule">
+        <field name="name">ITS Expal. Patronal</field>
+        <field name="code">CI_ITS_PAT</field>
+        <field name="sequence" eval="31"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+brut = categories.CI_BRUT
+result = brut * 10.40 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_its"/>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- 5500 - Taxe d'Apprentissage - 0.40% -->
+    <record id="rule_ci_taxe_apprentissage" model="hr.salary.rule">
+        <field name="name">Taxe d'Apprentissage</field>
+        <field name="code">CI_TA</field>
+        <field name="sequence" eval="32"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+brut = categories.CI_BRUT
+result = brut * 0.40 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_ta"/>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- 5550 - Formation Professionnelle Continue - 0.60% -->
+    <record id="rule_ci_fpc" model="hr.salary.rule">
+        <field name="name">Taxe Format. Prof. Continue</field>
+        <field name="code">CI_FPC</field>
+        <field name="sequence" eval="33"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+brut = categories.CI_BRUT
+result = brut * 0.60 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_fpc"/>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- 5600 - FPC à régulariser 31.12 - 0.60% -->
+    <record id="rule_ci_fpc_reg" model="hr.salary.rule">
+        <field name="name">FPC à régulariser 31.12</field>
+        <field name="code">CI_FPC_REG</field>
+        <field name="sequence" eval="34"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+brut = categories.CI_BRUT
+result = brut * 0.60 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_fpc"/>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- 5250 - Prestations Familiales CNPS - 5.75% (plafond 75 000) -->
+    <record id="rule_ci_pf" model="hr.salary.rule">
+        <field name="name">Prestations Familiales</field>
+        <field name="code">CI_PF</field>
+        <field name="sequence" eval="35"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Plafond CNPS PF : 75 000 FCFA/mois
+brut = categories.CI_BRUT
+base = min(brut, 75000)
+result = base * 5.75 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_cnps"/>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="note">Prestations Familiales CNPS : 5.75% (plafond 75 000 FCFA).</field>
+    </record>
+
+    <!-- 5300 - Accident du Travail - 3.00% (plafond 75 000) -->
+    <record id="rule_ci_at" model="hr.salary.rule">
+        <field name="name">Accident du Travail</field>
+        <field name="code">CI_AT</field>
+        <field name="sequence" eval="36"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Plafond CNPS AT : 75 000 FCFA/mois
+brut = categories.CI_BRUT
+base = min(brut, 75000)
+result = base * 3.00 / 100
+result_qty = 1.0
+        </field>
+        <field name="register_id" ref="contrib_register_cnps"/>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="note">Accident du Travail CNPS : 3.00% (plafond 75 000 FCFA).</field>
+    </record>
+
+    <!-- 5650 - CMU patronal (500 FCFA fixe) -->
+    <record id="rule_ci_cmu_pat" model="hr.salary.rule">
+        <field name="name">Prélèvement CMU (patronal)</field>
+        <field name="code">CI_CMU_PAT</field>
+        <field name="sequence" eval="37"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">fix</field>
+        <field name="amount_fix" eval="500"/>
+        <field name="register_id" ref="contrib_register_cmu"/>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- TOTAL COTISATIONS PATRONALES -->
+    <record id="rule_ci_total_cotis_pat" model="hr.salary.rule">
+        <field name="name">Total Cotisations patronales</field>
+        <field name="code">CI_TOT_COT_PAT</field>
+        <field name="sequence" eval="39"/>
+        <field name="category_id" ref="ci_categ_cotis_pat"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories.CI_COT_PAT
+        </field>
+        <field name="appears_on_payslip" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 4. AVANTAGES NON IMPOSABLES                                   -->
+    <!-- ============================================================ -->
+
+    <!-- 5020 - Prime de transport Abidjan -->
+    <record id="rule_ci_transport" model="hr.salary.rule">
+        <field name="name">Prime Transport Abidjan</field>
+        <field name="code">CI_TRANSP</field>
+        <field name="sequence" eval="40"/>
+        <field name="category_id" ref="ci_categ_avantages"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.l10n_ci_prime_transport &gt; 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Transport proratisé comme le salaire (convention CI 30 jours)
+jours = result_rules.CI_JOURS.total
+result = contract.l10n_ci_prime_transport * jours / 30
+result_qty = 1.0
+        </field>
+        <field name="note">Prime de transport non imposable proratisée (convention CI 30 jours).</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 5. NET A PAYER                                                -->
+    <!-- ============================================================ -->
+
+    <record id="rule_ci_net" model="hr.salary.rule">
+        <field name="name">NET A PAYER</field>
+        <field name="code">CI_NET</field>
+        <field name="sequence" eval="99"/>
+        <field name="category_id" ref="ci_categ_net"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Net = Brut + Cotisations salariales (négatives) + Avantages non imposables
+brut = categories.CI_BRUT
+cotis = categories.CI_COT_SAL  # Déjà négatif
+avantages = categories.CI_AVT
+net = brut + cotis + avantages
+# Arrondi aux 500 FCFA inférieurs (pratique courante CI)
+result = int(net / 500) * 500
+result_qty = 1.0
+        </field>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="note">Net à payer = Brut - Cotisations salariales + Avantages, arrondi aux 500 FCFA.</field>
+    </record>
+
+</odoo>

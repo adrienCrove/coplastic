@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_employee_form_ci" model="ir.ui.view">
+        <field name="name">hr.employee.form.ci</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Onglet Informations CI après l'onglet "Informations privées" -->
+            <xpath expr="//page[@name='hr_settings']" position="before">
+                <page string="Paie CI" name="ci_payroll">
+                    <group>
+                        <group string="Identification">
+                            <field name="l10n_ci_matricule"/>
+                            <field name="l10n_ci_cnps_number"/>
+                            <field name="l10n_ci_convention"/>
+                        </group>
+                        <group string="Classification">
+                            <field name="l10n_ci_categorie"/>
+                            <field name="l10n_ci_qualification"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Fiscalité">
+                            <field name="l10n_ci_parts_igr"/>
+                            <field name="l10n_ci_nb_children"/>
+                        </group>
+                        <group string="Coordonnées bancaires">
+                            <field name="l10n_ci_bank_name"/>
+                            <field name="l10n_ci_bank_account"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

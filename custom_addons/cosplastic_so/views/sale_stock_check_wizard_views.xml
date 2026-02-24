@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_stock_check_wizard_form" model="ir.ui.view">
+        <field name="name">sale.stock.check.wizard.form</field>
+        <field name="model">sale.stock.check.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Stock insuffisant">
+                <p style="color:#856404;background:#fff3cd;padding:10px;border-radius:4px;border:1px solid #ffc107;">
+                    <b>Attention :</b> La quantité demandée dépasse le stock disponible pour les produits
+                    ci-dessous. Cliquez sur <b>Valider</b> pour ajuster automatiquement les quantités
+                    au stock disponible et confirmer la commande.
+                </p>
+                <field name="line_ids" readonly="1" nolabel="1">
+                    <tree>
+                        <field name="product_id" string="Produit"/>
+                        <field name="requested_qty" string="Qté demandée"
+                               decoration-danger="requested_qty > available_qty"/>
+                        <field name="available_qty" string="Qté disponible"
+                               decoration-warning="available_qty &gt; 0"
+                               decoration-danger="available_qty &lt;= 0"/>
+                        <field name="uom_id" string="Unité"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_validate" string="Valider" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

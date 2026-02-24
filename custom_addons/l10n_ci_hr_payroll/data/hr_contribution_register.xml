@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+
+    <!-- Registres de cotisations -->
+    <record id="contrib_register_cnps" model="hr.contribution.register">
+        <field name="name">CNPS - Caisse Nationale de Prévoyance Sociale</field>
+    </record>
+
+    <record id="contrib_register_its" model="hr.contribution.register">
+        <field name="name">ITS - Impôt sur Traitements et Salaires</field>
+    </record>
+
+    <record id="contrib_register_cmu" model="hr.contribution.register">
+        <field name="name">CMU - Couverture Maladie Universelle</field>
+    </record>
+
+    <record id="contrib_register_fpc" model="hr.contribution.register">
+        <field name="name">FPC - Formation Professionnelle Continue</field>
+    </record>
+
+    <record id="contrib_register_ta" model="hr.contribution.register">
+        <field name="name">TA - Taxe d'Apprentissage</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+
+    <!-- Catégories spécifiques CI -->
+    <record id="ci_categ_brut" model="hr.salary.rule.category">
+        <field name="name">Brut</field>
+        <field name="code">CI_BRUT</field>
+    </record>
+
+    <record id="ci_categ_cotis_sal" model="hr.salary.rule.category">
+        <field name="name">Cotisations salariales</field>
+        <field name="code">CI_COT_SAL</field>
+    </record>
+
+    <record id="ci_categ_cotis_pat" model="hr.salary.rule.category">
+        <field name="name">Cotisations patronales</field>
+        <field name="code">CI_COT_PAT</field>
+    </record>
+
+    <record id="ci_categ_avantages" model="hr.salary.rule.category">
+        <field name="name">Avantages non imposables</field>
+        <field name="code">CI_AVT</field>
+    </record>
+
+    <record id="ci_categ_net" model="hr.salary.rule.category">
+        <field name="name">Net à payer</field>
+        <field name="code">CI_NET</field>
+    </record>
+
+</odoo>

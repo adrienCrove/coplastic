@@ -1,34 +1,29 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "cosplastic_so",
+    'name': "Coplastic - Ventes",
 
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
+    'summary': "Personnalisation des devis et bons de commande Coplastic",
 
     'description': """
-Long description of module's purpose
+        - Validité des devis par défaut : 14 jours
+        - Conditions de paiement 60 et 90 jours
+        - Lignes de commande en lecture seule après confirmation
+        - Protection contre la suppression (admin uniquement)
     """,
 
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
+    'author': "Coplastic",
+    'website': "https://www.coplastique.com",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Sales',
+    'version': '17.0.2.0.0',
+    'license': 'LGPL-3',
 
-    # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['sale', 'account', 'stock'],
 
-    # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
+        'data/payment_terms.xml',
+        'views/sale_stock_check_wizard_views.xml',
         'views/views.xml',
-        'views/templates.xml',
-    ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
     ],
 }
-

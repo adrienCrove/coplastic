@@ -8,24 +8,49 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
 
-            <!-- Bouton de certification manuelle dans le header -->
+            <!-- Boutons dans le header -->
             <xpath expr="//header" position="inside">
+                <!-- Bouton certification manuelle (facture non certifiée) -->
                 <button name="action_fne_certify"
                         string="Certifier FNE"
                         type="object"
                         class="btn-warning"
                         invisible="fne_certified or state != 'posted' or move_type not in ('out_invoice', 'out_refund')"
                         groups="account.group_account_invoice"/>
+                <!-- Bouton annuler simulation (facture certifiée en simulation) -->
+                <button name="action_fne_reset_simulation"
+                        string="Annuler simulation FNE"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="not fne_simulation or state != 'posted' or move_type not in ('out_invoice', 'out_refund')"
+                        groups="account.group_account_invoice"
+                        confirm="Cela va réinitialiser la certification simulation. Vous pourrez ensuite certifier la facture auprès de la DGI."/>
+            </xpath>
+
+            <!-- Bandeau alerte FNE non certifiée -->
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="alert alert-warning text-center mb-0" role="alert"
+                     invisible="fne_certified or state != 'posted' or move_type not in ('out_invoice', 'out_refund')">
+                    Cette facture n'a pas été certifiée FNE auprès de la DGI.
+                </div>
             </xpath>
 
             <!-- Badge FNE dans le titre -->
             <xpath expr="//div[hasclass('oe_title')]" position="inside">
                 <field name="fne_certified" invisible="1"/>
+                <field name="fne_simulation" invisible="1"/>
                 <div invisible="move_type not in ('out_invoice', 'out_refund') or state != 'posted'">
+                    <!-- Certifiée réellement (production) -->
                     <span class="badge rounded-pill text-bg-success fs-6"
-                          invisible="not fne_certified">
+                          invisible="not fne_certified or fne_simulation">
                         FNE Certifiée
                     </span>
+                    <!-- Certifiée en simulation -->
+                    <span class="badge rounded-pill text-bg-warning fs-6"
+                          invisible="not fne_simulation">
+                        FNE Simulation
+                    </span>
+                    <!-- Non certifiée -->
                     <span class="badge rounded-pill text-bg-danger fs-6"
                           invisible="fne_certified">
                         FNE Non certifiée

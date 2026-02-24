@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+
+    <!-- Structure salariale Côte d'Ivoire -->
+    <record id="structure_ci_base" model="hr.payroll.structure">
+        <field name="name">Bulletin de Paie - Côte d'Ivoire</field>
+        <field name="code">CI_PAIE</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="rule_ids" eval="[(6, 0, [
+            ref('rule_ci_jours'),
+            ref('rule_ci_base'),
+            ref('rule_ci_sursalaire'),
+            ref('rule_ci_anciennete'),
+            ref('rule_ci_conge'),
+            ref('rule_ci_brut'),
+            ref('rule_ci_retraite_sal'),
+            ref('rule_ci_its'),
+            ref('rule_ci_cmu_sal'),
+            ref('rule_ci_total_cotis_sal'),
+            ref('rule_ci_retraite_pat'),
+            ref('rule_ci_its_pat'),
+            ref('rule_ci_taxe_apprentissage'),
+            ref('rule_ci_fpc'),
+            ref('rule_ci_fpc_reg'),
+            ref('rule_ci_pf'),
+            ref('rule_ci_at'),
+            ref('rule_ci_cmu_pat'),
+            ref('rule_ci_total_cotis_pat'),
+            ref('rule_ci_transport'),
+            ref('rule_ci_net'),
+        ])]"/>
+    </record>
+
+</odoo>

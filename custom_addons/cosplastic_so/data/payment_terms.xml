@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Configurer la validité des devis à 14 jours -->
+    <function model="res.company" name="write">
+        <value eval="[ref('base.main_company')]"/>
+        <value eval="{'quotation_validity_days': 14}"/>
+    </function>
+
+    <!-- Condition de paiement : 60 Jours -->
+    <record id="account_payment_term_60days" model="account.payment.term">
+        <field name="name">60 Jours</field>
+        <field name="note">Paiement à 60 jours</field>
+        <field name="line_ids" eval="[Command.clear(), Command.create({'value': 'percent', 'value_amount': 100.0, 'nb_days': 60})]"/>
+    </record>
+
+    <!-- Condition de paiement : 90 Jours -->
+    <record id="account_payment_term_90days" model="account.payment.term">
+        <field name="name">90 Jours</field>
+        <field name="note">P90 jours</field>
+        <field name="line_ids" eval="[Command.clear(), Command.create({'value': 'percent', 'value_amount': 100.0, 'nb_days': 90})]"/>
+    </record>
+
+</odoo>
