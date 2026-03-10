@@ -22,5 +22,6 @@
         'security/ir.model.access.csv',
         'data/cron.xml',
         'views/views.xml',
+        'views/res_config_settings_views.xml',
     ],
 }

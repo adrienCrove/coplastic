@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import models, fields, api, _
 
 
@@ -96,14 +97,30 @@ class CoplasticStockAlert(models.AbstractModel):
         }).send()
 
         # Notification dans le canal Discuss
-        summary = '<b>Rapport quotidien — %d produit(s) en pénurie :</b><ul>%s</ul>' % (
-            len(low_stock),
-            ''.join('<li>%s : <b style="color:%s">%.2f %s</b> (seuil : %.2f)</li>' % (
-                p['name'],
-                'red' if p['qty'] <= 0 else 'orange',
-                p['qty'], p['uom'], p['threshold']
-            ) for p in low_stock)
+        rows = Markup('').join(
+            Markup(
+                '<tr>'
+                '<td style="padding:4px 10px;">{icon} <b>{name}</b></td>'
+                '<td style="padding:4px 10px; color:{color}; font-weight:bold;">{qty:.2f} {uom}</td>'
+                '<td style="padding:4px 10px;">{threshold:.2f} {uom}</td>'
+                '</tr>'
+            ).format(
+                icon='🔴' if p['qty'] <= 0 else '🟠',
+                color='red' if p['qty'] <= 0 else 'darkorange',
+                name=p['name'], qty=p['qty'], uom=p['uom'], threshold=p['threshold'],
+            ) for p in low_stock
         )
+        summary = Markup(
+            '<p>📦 <b>Rapport quotidien — {count} produit(s) en alerte de stock</b></p>'
+            '<table style="border-collapse:collapse; margin-top:4px;">'
+            '<thead><tr style="background:#f5f5f5;">'
+            '<th style="padding:4px 10px; text-align:left; border-bottom:1px solid #ddd;">Produit</th>'
+            '<th style="padding:4px 10px; text-align:left; border-bottom:1px solid #ddd;">Stock actuel</th>'
+            '<th style="padding:4px 10px; text-align:left; border-bottom:1px solid #ddd;">Seuil d\'alerte</th>'
+            '</tr></thead>'
+            '<tbody>{rows}</tbody>'
+            '</table>'
+        ).format(count=len(low_stock), rows=rows)
         Channel = self.env['discuss.channel'].sudo()
         channel = Channel.search([('name', '=', 'Alertes Stock')], limit=1)
         if not channel:
@@ -174,11 +191,28 @@ class CoplasticStockMove(models.Model):
                         }
                     )
                 # Notification dans le canal de discussion
-                self._post_stock_alert_to_channel(title, message, recipients)
+                self._post_stock_alert_to_channel(product, qty, recipients)
         return res
 
-    def _post_stock_alert_to_channel(self, title, message, recipients):
+    def _post_stock_alert_to_channel(self, product, qty, recipients):
         """Poste une alerte dans le canal 'Alertes Stock' de Discuss."""
+        is_rupture = qty <= 0
+        icon = '🔴' if is_rupture else '🟠'
+        label = 'Rupture de stock' if is_rupture else 'Stock faible'
+        color = 'red' if is_rupture else 'darkorange'
+        uom = product.uom_id.name
+        body = Markup(
+            '<p>{icon} <b style="color:{color}">{label}</b> — <b>{name}</b></p>'
+            '<p style="margin:2px 0;">'
+            'Stock actuel : <b style="color:{color}">{qty:.2f} {uom}</b>'
+            ' &nbsp;|&nbsp; '
+            'Seuil d\'alerte : <b>{threshold:.2f} {uom}</b>'
+            '</p>'
+        ).format(
+            icon=icon, color=color, label=label,
+            name=product.name, qty=qty, uom=uom,
+            threshold=product.stock_alert_qty,
+        )
         Channel = self.env['discuss.channel'].sudo()
         channel = Channel.search([('name', '=', 'Alertes Stock')], limit=1)
         if not channel:
@@ -187,11 +221,10 @@ class CoplasticStockMove(models.Model):
                 'channel_type': 'channel',
                 'description': 'Notifications automatiques de rupture de stock',
             })
-            # Ajouter les managers comme membres
             for partner in recipients.mapped('partner_id'):
                 channel.add_members(partner_ids=partner.ids)
         channel.sudo().message_post(
-            body='<b>%s</b><br/>%s' % (title, message),
+            body=body,
             message_type='comment',
             subtype_xmlid='mail.mt_comment',
             author_id=self.env.company.partner_id.id,

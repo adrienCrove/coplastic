@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_stock_alert" model="ir.ui.view">
+        <field name="name">res.config.settings.stock.alert</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@data-string='Inventory']" position="inside">
+                <block title="Alertes de stock" name="stock_alerts_container">
+                    <setting string="Seuil d'alerte stock global"
+                             help="Seuil par défaut pour tous les produits. Modifier cette valeur met à jour les produits qui ont encore l'ancienne valeur. Un produit modifié individuellement conserve sa propre valeur.">
+                        <field name="stock_alert_qty_default"/>
+                        <label for="stock_alert_qty_default" string="unités (0 = désactivé)"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
