@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         CANAL ALERTES FACTURATION
+    ============================================================ -->
+
+    <record id="channel_alertes_facturation" model="discuss.channel" forcecreate="True">
+        <field name="name">Alertes Facturation</field>
+        <field name="channel_type">channel</field>
+    </record>
+
+    <!-- ============================================================
+         FACTURES CLIENTS BIENTÔT ÉCHUES (cron)
+    ============================================================ -->
+
+    <record id="email_template_customer_invoice_due_soon" model="mail.template">
+        <field name="name">Alerte - Facture client bientôt échue</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">&#9888; Facture bientôt échue : ${object.name} - ${object.partner_id.name}</field>
+        <field name="email_to">${object.invoice_user_id.email or ''}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour <strong>${object.invoice_user_id.name or 'Utilisateur'}</strong>,</p>
+<p>La facture client suivante arrive bientôt à échéance et n'est pas encore réglée :</p>
+<table style="border-collapse:collapse;width:100%;max-width:600px">
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Facture</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.name}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Client</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.partner_id.name}</td>
+    </tr>
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Date d'échéance</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${format_date(object.invoice_date_due)}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Montant restant dû</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd;color:#c0392b"><strong>${format_amount(object.amount_residual, object.currency_id)}</strong></td>
+    </tr>
+</table>
+<p style="margin-top:16px">Merci de relancer le client dès que possible.</p>
+        ]]></field>
+    </record>
+
+    <!-- ============================================================
+         FACTURES FOURNISSEURS ÉCHUES
+    ============================================================ -->
+
+    <record id="email_template_vendor_invoice_overdue" model="mail.template">
+        <field name="name">Rappel - Facture fournisseur échue</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Facture fournisseur echue : ${object.name} - ${object.partner_id.name}</field>
+        <field name="email_to">${object.invoice_user_id.email or ''}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour <strong>${object.invoice_user_id.name or 'Utilisateur'}</strong>,</p>
+<p>La facture fournisseur suivante est arrivee a echeance et n'est pas encore reglee :</p>
+<table style="border-collapse:collapse;width:100%;max-width:600px">
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Facture</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.name}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Fournisseur</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.partner_id.name}</td>
+    </tr>
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Date d echeance</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${format_date(object.invoice_date_due)}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Montant restant du</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd;color:#c0392b"><strong>${format_amount(object.amount_residual, object.currency_id)}</strong></td>
+    </tr>
+</table>
+<p style="margin-top:16px">Merci de proceder au reglement dans les meilleurs delais.</p>
+        ]]></field>
+    </record>
+
+    <record id="automation_vendor_invoice_overdue" model="base.automation">
+        <field name="name">Rappel - Facture fournisseur échue</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_time</field>
+        <field name="trg_date_id" ref="account.field_account_move__invoice_date_due"/>
+        <field name="trg_date_range">1</field>
+        <field name="trg_date_range_type">day</field>
+        <field name="filter_domain">[('move_type', '=', 'in_invoice'), ('state', '=', 'posted'), ('payment_state', 'not in', ['paid', 'reversed', 'in_payment'])]</field>
+    </record>
+
+    <record id="server_action_vendor_invoice_overdue" model="ir.actions.server">
+        <field name="name">Envoyer rappel facture fournisseur échue</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="base_automation_id" ref="automation_vendor_invoice_overdue"/>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" ref="email_template_vendor_invoice_overdue"/>
+    </record>
+
+    <!-- ============================================================
+         BONS DE COMMANDE FOURNISSEUR NON RÉCEPTIONNÉS
+    ============================================================ -->
+
+    <record id="email_template_po_overdue" model="mail.template">
+        <field name="name">Rappel - Bon de commande non réceptionné</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="subject">BC non receptionne : ${object.name} - ${object.partner_id.name}</field>
+        <field name="email_to">${object.user_id.email or ''}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour <strong>${object.user_id.name or 'Utilisateur'}</strong>,</p>
+<p>Le bon de commande suivant n'a pas encore ete receptionne a la date prevue :</p>
+<table style="border-collapse:collapse;width:100%;max-width:600px">
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Bon de commande</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.name}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Fournisseur</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.partner_id.name}</td>
+    </tr>
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Date prevue</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${format_date(object.date_planned)}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Montant total</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${format_amount(object.amount_total, object.currency_id)}</td>
+    </tr>
+</table>
+<p style="margin-top:16px">Merci de verifier l etat de la reception aupres du fournisseur.</p>
+        ]]></field>
+    </record>
+
+    <record id="automation_po_overdue" model="base.automation">
+        <field name="name">Rappel - BC fournisseur non réceptionné</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="trigger">on_time</field>
+        <field name="trg_date_id" ref="purchase.field_purchase_order__date_planned"/>
+        <field name="trg_date_range">1</field>
+        <field name="trg_date_range_type">day</field>
+        <field name="filter_domain">[('state', '=', 'purchase'), ('receipt_status', 'in', ['pending', 'partial'])]</field>
+    </record>
+
+    <record id="server_action_po_overdue" model="ir.actions.server">
+        <field name="name">Envoyer rappel BC non réceptionné</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="base_automation_id" ref="automation_po_overdue"/>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" ref="email_template_po_overdue"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_accounting_alert" model="ir.ui.view">
+        <field name="name">res.config.settings.view.accounting.alert</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='invoicing_settings']" position="after">
+                <block title="Alertes de facturation" id="invoice_alert_settings">
+                    <setting string="Alerte avant échéance"
+                             help="Un email est envoyé au commercial N jours avant l'échéance de chaque facture client non payée.">
+                        <field name="invoice_alert_days"/>
+                        <label for="invoice_alert_days" string="jours avant échéance"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
