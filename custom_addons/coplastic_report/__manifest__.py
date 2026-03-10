@@ -17,10 +17,11 @@
     'version': '17.0.1.0.0',
     'license': 'LGPL-3',
 
-    'depends': ['web'],
+    'depends': ['web', 'stock'],
 
     'data': [
         'report/report_templates.xml',
+        'report/stock_report_visa.xml',
     ],
 
     'assets': {

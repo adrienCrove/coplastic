@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_delivery_visa" inherit_id="stock.report_delivery_document">
+        <!-- Donner un contexte positionné à la page (min-height < 237mm disponible sur A4) -->
+        <xpath expr="//div[@class='page']" position="attributes">
+            <attribute name="style">position: relative; min-height: 200mm;</attribute>
+        </xpath>
+        <!-- Bloc visa ancré en bas via position absolute -->
+        <xpath expr="//div[@name='signature']" position="after">
+            <div style="position: absolute; bottom: 5mm; left: 0; right: 0; page-break-inside: avoid; page-break-before: avoid;">
+                <div style="display: table; width: 100%;">
+                    <div style="display: table-cell; width: 45%; border: 1px solid #333; height: 90px; padding: 8px;">
+                        <strong>Visa Direction</strong>
+                    </div>
+                    <div style="display: table-cell; width: 10%;"/>
+                    <div style="display: table-cell; width: 45%; border: 1px solid #333; height: 90px; padding: 8px;">
+                        <strong>Visa Client</strong>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>
