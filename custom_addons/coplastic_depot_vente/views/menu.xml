@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menu principal sous Inventaire -->
+    <menuitem id="menu_depot_vente_root"
+              name="Dépôt-Vente"
+              parent="stock.menu_stock_root"
+              sequence="25"/>
+
+    <menuitem id="menu_depot_vente_orders"
+              name="Fiches de dépôt-vente"
+              parent="menu_depot_vente_root"
+              action="action_depot_vente_order"
+              sequence="10"/>
+
+</odoo>

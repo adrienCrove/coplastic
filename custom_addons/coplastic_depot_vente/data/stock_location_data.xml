@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Emplacement parent pour tous les vendeurs indépendants -->
+    <record id="location_depot_vente" model="stock.location">
+        <field name="name">Dépôt-Vente</field>
+        <field name="location_id" ref="stock.stock_location_locations"/>
+        <field name="usage">internal</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

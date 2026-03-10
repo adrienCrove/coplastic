@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===== VUE LISTE ===== -->
+    <record id="view_depot_vente_order_tree" model="ir.ui.view">
+        <field name="name">depot.vente.order.tree</field>
+        <field name="model">depot.vente.order</field>
+        <field name="arch" type="xml">
+            <tree string="Dépôt-Vente" decoration-success="state == 'done'"
+                  decoration-info="state == 'active'"
+                  decoration-warning="state == 'returned'"
+                  decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_remise"/>
+                <field name="date_retour_prevue"/>
+                <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-info="state == 'active'"
+                       decoration-warning="state == 'returned' or state == 'invoiced'"
+                       decoration-danger="state == 'cancel'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ===== VUE FORMULAIRE ===== -->
+    <record id="view_depot_vente_order_form" model="ir.ui.view">
+        <field name="name">depot.vente.order.form</field>
+        <field name="model">depot.vente.order</field>
+        <field name="arch" type="xml">
+            <form string="Dépôt-Vente">
+                <header>
+                    <!-- Boutons d'action selon l'état -->
+                    <button name="action_validate_remise"
+                            string="Remettre les produits"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Confirmer la remise des produits au vendeur ? Un transfert de stock sera créé et validé."/>
+                    <button name="action_validate_retour"
+                            string="Valider le retour"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'active'"
+                            confirm="Valider le retour des invendus ? Les quantités retournées seront réintégrées en stock."/>
+                    <button name="action_create_invoice"
+                            string="Générer la facture"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'returned'"/>
+                    <button name="action_done"
+                            string="Marquer comme terminé"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'invoiced'"/>
+                    <button name="action_cancel"
+                            string="Annuler"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state not in ['draft', 'active']"/>
+                    <button name="action_reset_draft"
+                            string="Remettre en brouillon"
+                            type="object"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,returned,invoiced,done"/>
+                </header>
+
+                <!-- Champs invisibles requis pour les modifiers -->
+                <field name="picking_out_id" invisible="1"/>
+                <field name="picking_in_id" invisible="1"/>
+                <field name="invoice_id" invisible="1"/>
+
+                <!-- Smart buttons -->
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_picking_out"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-truck"
+                            invisible="not picking_out_id">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Bon de sortie</span>
+                        </div>
+                    </button>
+                    <button name="action_view_picking_in"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-undo"
+                            invisible="not picking_in_id">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Bon de retour</span>
+                        </div>
+                    </button>
+                    <button name="action_view_invoice"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            invisible="not invoice_id">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Facture</span>
+                        </div>
+                    </button>
+                </div>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Informations">
+                            <field name="partner_id"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="date_remise" readonly="state != 'draft'"/>
+                            <field name="date_retour_prevue"/>
+                            <field name="location_src_id"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="location_dest_id"
+                                   readonly="1"
+                                   invisible="not location_dest_id"/>
+                        </group>
+                        <group string="Totaux" invisible="state == 'draft'">
+                            <field name="amount_total"
+                                   widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Lignes produits -->
+                    <field name="line_ids"
+                           readonly="state not in ['draft', 'active']"
+                           string="Produits">
+                        <tree editable="bottom">
+                            <field name="product_id"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="uom_id" readonly="1"/>
+                            <field name="qty_given"
+                                   string="Qté remise"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="price_unit"
+                                   string="Prix unitaire"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="qty_returned"
+                                   string="Qté retournée"
+                                   readonly="parent.state != 'active'"/>
+                            <field name="qty_sold" string="Qté vendue" readonly="1"/>
+                            <field name="subtotal"
+                                   string="Sous-total"
+                                   widget="monetary"
+                                   readonly="1"
+                                   sum="Total vendu"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </tree>
+                    </field>
+
+                    <!-- Notes internes -->
+                    <group string="Notes">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===== VUE RECHERCHE ===== -->
+    <record id="view_depot_vente_order_search" model="ir.ui.view">
+        <field name="name">depot.vente.order.search</field>
+        <field name="model">depot.vente.order</field>
+        <field name="arch" type="xml">
+            <search string="Dépôt-Vente">
+                <field name="name" string="Référence"/>
+                <field name="partner_id" string="Vendeur"/>
+                <filter name="draft" string="Brouillon" domain="[('state', '=', 'draft')]"/>
+                <filter name="active" string="En cours" domain="[('state', '=', 'active')]"/>
+                <filter name="returned" string="Retourné" domain="[('state', '=', 'returned')]"/>
+                <filter name="invoiced" string="Facturé" domain="[('state', '=', 'invoiced')]"/>
+                <filter name="done" string="Terminé" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="today" string="Remis aujourd'hui"
+                        domain="[('date_remise', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Grouper par">
+                    <filter name="group_partner" string="Vendeur"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="État"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_date" string="Date de remise"
+                            context="{'group_by': 'date_remise'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ===== ACTION ===== -->
+    <record id="action_depot_vente_order" model="ir.actions.act_window">
+        <field name="name">Dépôt-Vente</field>
+        <field name="res_model">depot.vente.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_depot_vente_order_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer une première fiche de dépôt-vente
+            </p>
+            <p>
+                Gérez la remise de produits à vos vendeurs indépendants,
+                enregistrez les retours et générez les factures automatiquement.
+            </p>
+        </field>
+    </record>
+
+</odoo>
