@@ -1,0 +1,106 @@
+METHODOLOGIE DES OPERATIONS COMPTABLES DANS ODOO
+=================================================
+Date : 07/03/2026
+
+
+1. FACTURE CLIENTE
+------------------
+Chemin : Facturation > Clients > Factures > Nouveau
+
+Journal utilisé : Ventes (automatique)
+
+Ecriture generee :
+  Debit  411xxx Client        500.000
+  Credit 701xxx Vente                    500.000
+
+Workflow :
+  - Creer la facture
+  - Valider (Confirmer)
+  - Quand le client paie -> "Enregistrer un paiement"
+  - Odoo lettre automatiquement le compte 411
+
+
+2. FACTURE FOURNISSEUR
+----------------------
+Chemin : Facturation > Fournisseurs > Factures > Nouveau
+
+Journal utilise : Achats (automatique)
+
+Ecriture generee :
+  Debit  601xxx Achat         200.000
+  Credit 401xxx Fournisseur              200.000
+
+Workflow :
+  - Creer la facture fournisseur
+  - Valider (Confirmer)
+  - Quand tu paies -> "Enregistrer un paiement"
+  - Odoo lettre automatiquement le compte 401
+
+
+3. SORTIE CAISSE VERS BANQUE (Virement interne)
+-----------------------------------------------
+Chemin : Facturation > Clients > Paiements > Nouveau
+
+Parametres :
+  - Cocher "Virement interne" : OUI
+  - Type de paiement         : Envoyer
+  - Journal                  : Especes (source)
+  - Journal de destination   : Banque (destination)
+  - Montant                  : montant a transferer
+  - Date                     : date de l'operation
+
+Odoo cree automatiquement 3 ecritures :
+  PCSH : Debit 580 (transit) / Credit 571 (Especes)  -> sortie caisse
+  PBNK : Debit 521 (Banque)  / Credit 580 (transit)  -> entree banque
+  CSH  : Lettrage du compte 580 -> solde a zero (transfert confirme)
+
+Note : Le second paiement (PBNK) est cree et comptabilise automatiquement
+       par Odoo. Il n'est pas necessaire de le creer manuellement.
+
+
+4. OPERATIONS DIVERSES (OD)
+----------------------------
+Chemin : Facturation > Comptabilite > Ecritures comptables > Nouveau
+
+Journal utilise : Divers UNIQUEMENT (restriction native Odoo)
+  -> Les journaux Ventes, Achats, Banque, Especes ne sont pas accessibles
+     en ecriture manuelle. Ils ont chacun leur interface dediee.
+
+Cas d'usage des OD (tout ce qui ne passe pas par une facture ou paiement) :
+
+  - Amortissements          : Debit 681 / Credit 281
+  - Regularisations         : Charges constatees d'avance
+  - Corrections d'erreurs   : Reimputation entre comptes
+  - Provisions              : Debit 681 / Credit 391
+  - Ecritures de cloture    : Resultat de l'exercice
+  - Salaires                : Debit 661 / Credit 421
+
+Regle : Si l'operation a une piece commerciale (facture, bon) -> utiliser
+        la facturation. Si c'est un mouvement purement comptable -> OD.
+
+
+RESUME DES JOURNAUX ET LEURS ACCES
+------------------------------------
+
+  Journal    | Reserve a                    | Acces direct
+  -----------|------------------------------|---------------------------
+  Ventes     | Factures clients             | Non - via Clients
+  Achats     | Factures fournisseurs        | Non - via Fournisseurs
+  Banque     | Paiements / Releves          | Non - via Paiements
+  Especes    | Paiements cash               | Non - via Paiements
+  Divers     | Ecritures manuelles (OD)     | Oui - via Ecritures
+
+
+LE LETTRAGE
+-----------
+Le lettrage consiste a associer des ecritures qui se compensent sur un
+meme compte, pour indiquer qu'elles sont "reglees" entre elles.
+
+Exemple : Facture 500.000 + Paiement 500.000 sur compte 411
+  -> Odoo lettre les deux lignes : solde = 0, facture = payee
+
+Sans lettrage : la facture reste en "impayee" et le client est en relance.
+Avec lettrage : la facture passe en "payee", plus de relance.
+
+Le rapprochement bancaire = lettrage entre le releve bancaire reel
+et les ecritures Odoo, pour confirmer que les deux sont d'accord.

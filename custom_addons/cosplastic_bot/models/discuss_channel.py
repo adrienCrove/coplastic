@@ -11,62 +11,33 @@ class DiscussChannel(models.Model):
     # COMMANDES SLASH COPLASTICBOT
     # ==========================================
 
-    def _post_bot_message(self, command, body=""):
-        """Poste un message d'OdooBot en réponse à une commande"""
-        odoobot_id = self.env['ir.model.data']._xmlid_to_res_id("base.partner_root")
-        mail_bot = self.env['mail.bot']
-
-        # Récupérer la réponse du bot
-        answer = mail_bot._handle_command(command, body, self)
-
-        if answer:
-            subtype_id = self.env['ir.model.data']._xmlid_to_res_id('mail.mt_comment')
-            self.with_context(mail_create_nosubscribe=True).sudo().message_post(
-                body=answer,
-                author_id=odoobot_id,
-                message_type='comment',
-                subtype_id=subtype_id
-            )
-
     def execute_command_aide(self, **kwargs):
         """Commande /aide - Affiche l'aide de CoplasticBot"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("aide", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="aide")
 
     def execute_command_devis(self, **kwargs):
         """Commande /devis - Aide à créer un devis"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("devis", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="devis")
 
     def execute_command_client(self, **kwargs):
         """Commande /client - Recherche ou crée un client"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("client", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="client")
 
     def execute_command_stock(self, **kwargs):
         """Commande /stock - Vérifie le stock d'un produit"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("stock", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="stock")
 
     def execute_command_facture(self, **kwargs):
         """Commande /facture - Aide à créer une facture"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("facture", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="facture")
 
     def execute_command_commande(self, **kwargs):
         """Commande /commande - Aide à créer une commande"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("commande", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="commande")
 
     def execute_command_produit(self, **kwargs):
         """Commande /produit - Recherche un produit"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("produit", body)
-
-    def execute_command_tech(self, **kwargs):
-        """Commande /tech - Questions techniques développement Odoo"""
-        body = kwargs.get('body', '')
-        self._post_bot_message("tech", body)
+        self.env['mail.bot']._apply_logic(self, kwargs, command="produit")
 
     @api.model
     def _get_available_commands(self):
@@ -102,10 +73,6 @@ class DiscussChannel(models.Model):
             {
                 'name': 'produit',
                 'help': _("Recherche un produit"),
-            },
-            {
-                'name': 'tech',
-                'help': _("Questions techniques (développement Odoo)"),
             },
         ]
 

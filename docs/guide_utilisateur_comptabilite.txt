@@ -1,0 +1,96 @@
+GUIDE PRATIQUE - COMPTABILITE ODOO
+Co-plastic | Mars 2026
+===================================
+
+
+COMMENT FAIRE UNE FACTURE CLIENT ?
+------------------------------------
+C'est quand vous vendez quelque chose a un client et vous voulez lui
+envoyer une facture.
+
+  1. Aller dans : Facturation > Clients > Factures
+  2. Cliquer sur "Nouveau"
+  3. Choisir le client
+  4. Ajouter les produits vendus avec les quantites et prix
+  5. Cliquer sur "Confirmer"
+  6. Envoyer la facture au client par email ou imprimer
+
+Quand le client vous paie :
+  7. Ouvrir la facture
+  8. Cliquer sur "Enregistrer un paiement"
+  9. Choisir comment il a paye (Banque ou Especes) et le montant
+  10. Valider -> la facture passe automatiquement en "Payee"
+
+
+COMMENT FAIRE UNE FACTURE FOURNISSEUR ?
+-----------------------------------------
+C'est quand vous recevez une facture d'un fournisseur que vous devez payer.
+
+  1. Aller dans : Facturation > Fournisseurs > Factures
+  2. Cliquer sur "Nouveau"
+  3. Choisir le fournisseur
+  4. Saisir les produits/services recus avec les montants
+  5. Cliquer sur "Confirmer"
+
+Quand vous payez le fournisseur :
+  6. Ouvrir la facture
+  7. Cliquer sur "Enregistrer un paiement"
+  8. Choisir comment vous payez (Banque ou Especes) et le montant
+  9. Valider -> la facture passe automatiquement en "Payee"
+
+
+COMMENT TRANSFERER DE L'ARGENT DE LA CAISSE VERS LA BANQUE ?
+--------------------------------------------------------------
+C'est quand vous prenez de l'argent dans la caisse physique pour
+le deposer sur le compte bancaire.
+
+  1. Aller dans : Facturation > Clients > Paiements
+  2. Cliquer sur "Nouveau"
+  3. Cocher la case "Virement interne"
+  4. Remplir les champs :
+       - Type de paiement    : Envoyer
+       - Journal             : Especes
+       - Journal destination : Banque
+       - Montant             : le montant a transferer
+       - Date                : la date du jour
+  5. Cliquer sur "Confirmer"
+
+Odoo va automatiquement creer l'ecriture correspondante dans le journal
+Banque. Vous n'avez rien d'autre a faire.
+
+
+COMMENT FAIRE UNE ECRITURE COMPTABLE MANUELLE (OD) ?
+------------------------------------------------------
+Une OD (Operation Diverse) sert pour les ecritures comptables qui ne
+correspondent pas a une facture ou un paiement. Par exemple :
+  - Enregistrer les salaires du mois
+  - Faire une correction d'erreur
+  - Enregistrer un amortissement de materiel
+  - Faire une provision
+
+  1. Aller dans : Facturation > Comptabilite > Ecritures comptables
+  2. Cliquer sur "Nouveau"
+  3. Le journal sera automatiquement "Divers" (c'est normal, c'est le seul
+     disponible pour les ecritures manuelles)
+  4. Saisir la date et le libelle de l'operation
+  5. Ajouter les lignes comptables (debits et credits)
+     -> Le total debit doit etre egal au total credit
+  6. Cliquer sur "Confirmer"
+
+IMPORTANT : Pour les factures et les paiements, utilisez toujours les
+menus dedies (Clients / Fournisseurs / Paiements). N'essayez pas de
+les saisir manuellement en OD, Odoo ne vous le permettra pas et ce
+n'est pas la bonne methode.
+
+
+RAPPEL : OU TROUVER QUOI ?
+---------------------------
+
+  Ce que je veux faire              | Ou aller dans Odoo
+  ----------------------------------|------------------------------------------
+  Faire une facture client          | Facturation > Clients > Factures
+  Encaisser un paiement client      | Ouvrir la facture > Enregistrer paiement
+  Saisir une facture fournisseur    | Facturation > Fournisseurs > Factures
+  Payer un fournisseur              | Ouvrir la facture > Enregistrer paiement
+  Transferer caisse vers banque     | Facturation > Clients > Paiements
+  Ecriture comptable manuelle (OD)  | Facturation > Comptabilite > Ecritures

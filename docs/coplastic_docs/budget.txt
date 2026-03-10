@@ -1,0 +1,122 @@
+GESTION BUDGÉTAIRE
+Module: base_account_budget (inclus dans base_accounting_kit) | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+Ce module permet de créer et suivre des budgets analytiques.
+Il compare les montants planifiés (prévisionnel) avec les montants réels
+enregistrés dans la comptabilité.
+
+==============================================================
+CONFIGURATION PRÉALABLE: POSTES BUDGÉTAIRES
+==============================================================
+Menu: Paramètres → Comptabilité → Postes budgétaires → Nouveau
+
+Un poste budgétaire est un regroupement de comptes comptables:
+  - Nom: ex. "Charges de personnel", "Achats de matières"
+  - Comptes: sélectionner les comptes comptables concernés
+  - Société: pour les configurations multi-sociétés
+
+Exemples de postes:
+  - Charges de personnel → comptes 66xxx
+  - Ventes produits → comptes 70xxx
+  - Achats matières → comptes 60xxx
+
+==============================================================
+CRÉER UN BUDGET
+==============================================================
+Menu: Comptabilité → Écritures et rapports → Budgets → Nouveau
+
+1. INFORMATIONS GÉNÉRALES:
+   - Nom: ex. "Budget 2026 - Exploitation"
+   - Période: du... au... (ex: 01/01/2026 au 31/12/2026)
+   - Responsable: utilisateur créateur (auto-renseigné)
+   - Société
+
+2. LIGNES BUDGÉTAIRES (onglet "Lignes budgétaires"):
+   Ajouter une ligne par poste budgétaire / compte analytique:
+   - Poste budgétaire: sélectionner le poste configuré
+   - Compte analytique: sélectionner le centre de coût / projet
+   - Date de début / fin de la ligne (peut être différente du budget global)
+   - Montant prévu: saisir le montant planifié
+
+3. COLONNES DE SUIVI (auto-calculées):
+   - Montant pratique: montant réel des écritures comptables sur la période
+   - Montant théorique: montant pro-rata de la période écoulée
+   - Pourcentage: réalisation (montant pratique / montant prévu × 100)
+
+==============================================================
+CYCLE DE VIE D'UN BUDGET
+==============================================================
+États et transitions:
+
+1. BROUILLON → Modifier librement
+   Bouton "Confirmer" →
+
+2. CONFIRMÉ → En attente de validation
+   Bouton "Approuver" →
+
+3. VALIDÉ → Budget actif, suivi en cours
+   Bouton "Terminé" →
+
+4. TERMINÉ → Budget clôturé
+
+À tout moment (depuis Confirmé ou Validé):
+   Bouton "Annuler" → passe en Annulé
+   Depuis Annulé: "Réinitialiser" → retour en Brouillon
+
+==============================================================
+SUIVRE L'EXÉCUTION BUDGÉTAIRE
+==============================================================
+Menu: Comptabilité → Écritures et rapports → Budgets
+
+Vue liste: aperçu de tous les budgets avec statut
+Vue formulaire: détail des lignes avec colonnes de réalisation
+
+INDICATEURS SUR CHAQUE LIGNE:
+- Montant prévu: planifié
+- Montant pratique: dépenses/recettes réelles de la comptabilité
+- Montant théorique: pro-rata calculé automatiquement
+- %: taux de réalisation
+
+EXEMPLES D'INTERPRÉTATION:
+- 80% sur une ligne de charges à 90% de la période → légèrement sous budget (bon)
+- 120% sur une ligne de charges → dépassement budgétaire (alerte)
+- 50% sur une ligne de recettes à 90% de la période → sous-performance
+
+==============================================================
+COMPTES ANALYTIQUES (CENTRES DE COÛTS)
+==============================================================
+Les comptes analytiques permettent de suivre le budget par projet, département ou activité.
+
+Créer un compte analytique:
+Menu: Comptabilité → Configuration → Comptes analytiques → Nouveau
+  - Nom: ex. "Projet A", "Direction Commerciale", "Usine"
+  - Code
+  - Société
+
+Affecter un compte analytique sur une écriture:
+  - Sur les factures / achats: colonne "Compte analytique" sur chaque ligne
+
+==============================================================
+RAPPORTS BUDGÉTAIRES
+==============================================================
+Les rapports de suivi budgétaire sont disponibles directement dans la vue
+formulaire du budget (colonnes montant pratique, théorique, %).
+
+Pour une analyse plus avancée (MIS Builder):
+Menu: Reporting → MIS Reporting → MIS Reports
+→ Créer un rapport avec des KPIs qui référencent les postes budgétaires
+
+==============================================================
+DÉPANNAGE
+==============================================================
+Montant pratique = 0 alors que des écritures existent:
+→ Vérifier que les comptes de l'écriture sont dans le poste budgétaire
+→ Vérifier que la date de l'écriture est dans la plage de la ligne budgétaire
+→ Vérifier que le compte analytique est bien affecté sur les écritures
+
+Budget ne peut pas être modifié:
+→ Le budget doit être en état "Brouillon" pour être modifié
+→ Utiliser "Annuler" puis "Réinitialiser" si nécessaire

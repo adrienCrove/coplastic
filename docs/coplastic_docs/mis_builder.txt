@@ -1,0 +1,188 @@
+MIS BUILDER - RAPPORTS FINANCIERS PERSONNALISÉS
+Module: mis_builder (OCA) | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+MIS Builder permet de créer des rapports financiers personnalisés (tableaux de bord,
+compte de résultat, bilan, tableaux de flux) avec des formules sur les comptes.
+Les rapports peuvent être exportés en PDF ou Excel et ajoutés au tableau de bord.
+
+==============================================================
+MENU
+==============================================================
+Configuration des modèles:
+  Comptabilité → Configuration → MIS Reporting → Modèles de rapports MIS
+  Comptabilité → Configuration → MIS Reporting → Styles de rapports MIS
+
+Générer / consulter les rapports:
+  Reporting → MIS Reporting → Rapports MIS
+  Reporting → MIS Reporting → Derniers rapports générés
+
+==============================================================
+ÉTAPE 1 - CRÉER UN MODÈLE DE RAPPORT
+==============================================================
+Menu: Comptabilité → Configuration → MIS Reporting → Modèles de rapports MIS → Nouveau
+
+1. INFORMATIONS DE BASE:
+   - Nom: ex. "Compte de Résultat", "Bilan", "Tableau de Trésorerie"
+   - Description (optionnelle)
+   - Style: sélectionner un style de mise en forme
+
+2. DÉFINIR LES INDICATEURS (KPIs) - onglet "Indicateurs":
+   Chaque ligne est un indicateur calculé:
+   - Séquence: ordre d'affichage
+   - Description: libellé affiché dans le rapport (ex: "Chiffre d'affaires")
+   - Nom: identifiant interne (ex: kpi_ca) - sans espaces
+   - Type: numérique, texte, pourcentage...
+   - Expression: formule de calcul
+
+   SYNTAXE DES EXPRESSIONS:
+   - bal[70]      → solde du compte 70 sur la période
+   - bali[70]     → solde initial du compte 70
+   - bale[70]     → solde final du compte 70
+   - crd[40%]     → crédits sur comptes commençant par 40
+   - deb[60%]     → débits sur comptes commençant par 60
+   - bal[70,71]   → solde des comptes 70 et 71
+   - bal[1%%]     → solde de tous les comptes commençant par 1
+   - kpi_ca - kpi_charges → différence entre deux autres KPIs
+
+   EXEMPLES CONCRETS:
+   - Chiffre d'affaires: bal[70,71,72,74]
+   - Achats: bal[60,61]
+   - Charges personnel: bal[66]
+   - Résultat brut: kpi_ca - kpi_achats
+   - Taux de marge: kpi_resultat_brut / kpi_ca * 100
+
+3. DÉFINIR DES REQUÊTES (optionnel) - onglet "Requêtes":
+   Pour inclure des données non-comptables (ex: nombre de commandes)
+   - Modèle Odoo (ex: sale.order)
+   - Champs à agréger
+   - Filtre de domaine
+
+==============================================================
+ÉTAPE 2 - CRÉER UNE INSTANCE DE RAPPORT (pour générer)
+==============================================================
+Menu: Reporting → MIS Reporting → Rapports MIS → Nouveau
+
+1. INFORMATIONS:
+   - Nom: ex. "Résultats Mensuel - Janvier 2026"
+   - Modèle: sélectionner le modèle créé à l'étape 1
+   - Devise
+
+2. PÉRIODE SIMPLE (mode normal):
+   - Plage de dates prédéfinie OU
+   - Date de début + Date de fin manuellement
+
+3. MODE COMPARAISON (plusieurs colonnes/périodes):
+   - Activer "Mode comparaison"
+   - Onglet "Colonnes": ajouter autant de colonnes que nécessaire
+     - ex: Jan 2026 | Fév 2026 | Mar 2026 | ou N vs N-1
+
+4. FILTRES:
+   - Mouvements: brouillons / comptabilisés / tous
+   - Société(s): filtrage multi-société
+   - Domaine analytique: filtrer par centre de coût
+
+5. AFFICHAGE:
+   - Format PDF: portrait ou paysage
+   - Afficher la description des colonnes
+
+==============================================================
+GÉNÉRER ET EXPORTER UN RAPPORT
+==============================================================
+Depuis la fiche du rapport (Reporting → MIS Reporting → Rapports MIS):
+
+  Bouton "Aperçu" → affiche le rapport dans l'interface Odoo
+  Bouton "Imprimer" → génère le PDF
+  Bouton "Exporter" → télécharge le fichier Excel (XLSX)
+  Bouton "Ajouter au tableau de bord" → ajoute un widget au tableau de bord Odoo
+
+==============================================================
+STYLES DE RAPPORT
+==============================================================
+Menu: Comptabilité → Configuration → MIS Reporting → Styles de rapports MIS
+
+Configurer l'apparence des lignes:
+  - Arrondi (décimales)
+  - Facteur (diviser par 1000 pour afficher en milliers)
+  - Préfixe / Suffixe (ex: "FCFA", "%")
+  - Couleur du texte / fond
+  - Style de police (normal, gras, italique)
+  - Niveau d'indentation
+  - Masquer si vide / masquer toujours
+
+==============================================================
+EXEMPLES D'UTILISATION
+==============================================================
+
+COMPTE DE RÉSULTAT SIMPLE:
+Indicateurs:
+  - Chiffre d'affaires:     bal[70,71,72,74,75]
+  - Achats et charges ext:  bal[60,61,62,63]
+  - Charges personnel:      bal[66]
+  - Dotations amortissements: bal[68]
+  - Résultat exploitation:  kpi_ca - kpi_charges_ext - kpi_personnel - kpi_dotations
+
+ANALYSE DE TRÉSORERIE:
+Indicateurs:
+  - Solde banque:     bal[512%]
+  - Solde caisse:     bal[53%]
+  - Créances clients: bal[41%]
+  - Dettes fournisseurs: bal[40%]
+
+==============================================================
+TABLEAU DE BORD
+==============================================================
+Les rapports MIS peuvent être ajoutés au tableau de bord Odoo:
+1. Ouvrir le rapport
+2. Cliquer "Ajouter au tableau de bord"
+3. Choisir le tableau de bord cible
+4. Le rapport se met à jour automatiquement selon la période configurée
+
+==============================================================
+RAPPORTS OCA FINANCIERS (account_financial_report)
+==============================================================
+Menu: Reporting → Rapports comptables OCA
+
+Rapports disponibles avec filtres et export PDF/XLSX:
+
+GRAND LIVRE (General Ledger):
+  Reporting → Rapports comptables OCA → Grand Livre
+  - Dates, journaux, comptes, partenaires
+  - Grouper par: compte, journal, partenaire, centre de coût
+  - Export PDF ou XLSX
+
+JOURNAL COMPTABLE (Journal Ledger):
+  Reporting → Rapports comptables OCA → Journal comptable
+  - Transactions groupées par journal
+  - Export PDF ou XLSX
+
+BALANCE DE VÉRIFICATION (Trial Balance):
+  Reporting → Rapports comptables OCA → Balance de vérification
+  - Résumé débit/crédit par compte
+  - Mode comparaison avec période précédente
+  - Export PDF ou XLSX
+
+ÉLÉMENTS OUVERTS (Open Items):
+  Reporting → Rapports comptables OCA → Éléments ouverts
+  - Factures non lettrées (impayées)
+  - Analyse clients / fournisseurs
+  - Export PDF ou XLSX
+
+BALANCE ÂGÉE PARTENAIRES:
+  Reporting → Rapports comptables OCA → Balance âgée partenaires
+  - Colonnes: Courant, +30j, +60j, +90j, +120j
+  - Clients et/ou fournisseurs
+  - Export PDF ou XLSX
+
+RAPPORT TVA:
+  Reporting → Rapports comptables OCA → Rapport TVA
+  - Récapitulatif des taxes par période
+  - Export PDF ou XLSX
+
+PROCÉDURE STANDARD POUR TOUS CES RAPPORTS:
+1. Aller dans le menu du rapport choisi
+2. Configurer les filtres (dates, société, journaux, comptes...)
+3. Cliquer "Voir" → aperçu HTML
+4. Cliquer "Exporter PDF" ou "Exporter XLSX"

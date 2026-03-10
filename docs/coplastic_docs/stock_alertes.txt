@@ -1,0 +1,122 @@
+GESTION DU STOCK ET ALERTES
+Module: coplastic_stock | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+Ce module ajoute des fonctionnalités de surveillance du stock:
+- Seuils d'alerte configurables par produit
+- Notifications automatiques par email et messagerie interne
+- Historique des impressions de bons de livraison
+
+==============================================================
+CONFIGURER UN SEUIL D'ALERTE SUR UN PRODUIT
+==============================================================
+Menu: Inventaire → Produits → Sélectionner un produit
+
+1. Ouvrir la fiche produit
+2. Aller dans l'onglet "Inventaire" ou "Informations générales"
+3. Renseigner le champ "Quantité d'alerte stock" (valeur > 0 pour activer)
+4. Sauvegarder
+
+Exemples:
+- Seuil = 10: une alerte est envoyée quand le stock descend sous 10 unités
+- Seuil = 0: pas d'alerte configurée pour ce produit
+- Rupture (stock = 0): toujours signalée, même sans seuil configuré
+
+==============================================================
+TYPES D'ALERTES
+==============================================================
+
+ALERTE TEMPS RÉEL (lors de chaque mouvement de stock):
+Déclenchée automatiquement quand un bon de livraison est validé.
+- Rupture de stock (quantité = 0): notification en rouge, message "RUPTURE"
+- Stock faible (sous le seuil): notification en orange, message "STOCK FAIBLE"
+
+Destinataires:
+- Tous les responsables du stock (groupe: Gestionnaire d'inventaire)
+- Tous les administrateurs système
+
+Canaux de notification:
+1. Toast in-app: notification orange/rouge en haut de l'écran Odoo
+2. Message Discuss: dans le canal "Alertes Stock"
+
+==============================================================
+ALERTE QUOTIDIENNE PAR EMAIL
+==============================================================
+Un cron s'exécute automatiquement chaque jour.
+Il envoie un récapitulatif des produits en alerte:
+
+Format de l'email:
+- Tableau HTML avec colonnes: Produit | Stock actuel | Seuil d'alerte
+- Lignes en rouge: produits en rupture totale (stock = 0)
+- Lignes en orange: produits sous le seuil d'alerte
+- Destinataires: responsables stock + administrateurs
+
+Canal Discuss "Alertes Stock":
+- Le même récapitulatif est posté dans le canal Discuss
+- Le canal est créé automatiquement s'il n'existe pas
+- Les utilisateurs concernés sont ajoutés automatiquement au canal
+
+==============================================================
+CANAL "ALERTES STOCK"
+==============================================================
+Menu: Discuss → Canaux → Alertes Stock
+
+Ce canal centralise toutes les alertes stock:
+- Alertes temps réel lors des livraisons
+- Récapitulatif quotidien des produits sous seuil
+- Historique consultable
+
+Pour accéder: cliquer sur l'icône Discuss (bulle) → chercher "Alertes Stock"
+
+==============================================================
+HISTORIQUE DES IMPRESSIONS DE BONS DE LIVRAISON
+==============================================================
+Menu: Inventaire → Opérations → Transferts → Sélectionner un transfert
+
+Chaque impression de bon de livraison est enregistrée avec:
+- Date et heure d'impression
+- Utilisateur qui a imprimé
+- Numéro d'impression (1ère impression, 2ème impression, etc.)
+- Bon de livraison concerné
+
+Consultation de l'historique:
+1. Ouvrir le bon de livraison
+2. Voir le champ "Dernière impression" en entête
+3. Pour l'historique complet: onglet ou smart button "Impressions"
+
+==============================================================
+IMPRIMER UN BON DE LIVRAISON
+==============================================================
+Menu: Inventaire → Opérations → Transferts
+
+1. Ouvrir le transfert (statut: Prêt ou Fait)
+2. Cliquer sur Imprimer → Bon de livraison
+3. L'impression est automatiquement enregistrée dans l'historique
+
+==============================================================
+RAPPORT DES PRODUITS EN ALERTE
+==============================================================
+Pour voir tous les produits sous leur seuil d'alerte:
+Menu: Inventaire → Rapports → Inventaire
+
+Filtrer par:
+- "Quantité disponible" inférieure à un seuil
+- Ou consulter le canal Discuss "Alertes Stock" pour le dernier récapitulatif
+
+==============================================================
+DÉPANNAGE
+==============================================================
+Pas d'email d'alerte reçu:
+- Vérifier que l'email de l'utilisateur est renseigné
+- Vérifier la configuration email: Paramètres → Discuss → Email
+- Vérifier que le cron est actif: Paramètres → Technique → Automatisations planifiées
+
+Pas de notification in-app:
+- Vérifier que l'utilisateur est dans le groupe "Gestionnaire d'inventaire"
+- Vérifier la configuration des notifications navigateur
+
+Canal "Alertes Stock" introuvable:
+- Il se crée automatiquement lors de la première alerte
+- Ou le créer manuellement: Discuss → Nouveau canal → "Alertes Stock"

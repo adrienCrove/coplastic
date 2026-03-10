@@ -1,0 +1,109 @@
+GESTION DES VENTES COPLASTIC
+Module: cosplastic_so | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+Personnalisations des commandes de vente pour Coplastic:
+protection des commandes, contrôle des délais, vérification du stock
+et champs spécifiques aux partenaires ivoiriens.
+
+==============================================================
+CRÉER UN DEVIS
+==============================================================
+Menu: Ventes → Devis → Nouveau
+
+Étapes:
+1. Sélectionner le client
+2. La date d'expiration est fixée automatiquement à 14 jours
+3. Ajouter les lignes de produits (quantité, prix, remise)
+4. Cliquer sur "Envoyer par email" ou "Confirmer"
+
+ATTENTION - Règles de validité:
+- La validité maximale d'un devis est de 14 jours à partir de la date de commande
+- Il n'est pas possible de mettre une date d'expiration dans le passé
+- Ces limites sont imposées automatiquement par le système
+
+==============================================================
+CONFIRMER UNE COMMANDE
+==============================================================
+1. Ouvrir le devis
+2. Cliquer sur "Confirmer la commande"
+3. Le système vérifie automatiquement le stock:
+   - Si tous les produits sont disponibles → commande confirmée
+   - Si un produit est en rupture → boîte de dialogue d'avertissement affichée
+
+En cas d'alerte stock:
+- Un wizard affiche les produits en manque avec quantité demandée vs disponible
+- Seul un administrateur peut forcer la confirmation malgré le manque de stock
+- Les utilisateurs normaux doivent attendre le réapprovisionnement
+
+VERROUILLAGE AUTOMATIQUE:
+Toutes les commandes confirmées sont automatiquement verrouillées.
+Pour modifier une commande confirmée: seul l'administrateur peut déverrouiller
+via le bouton "Déverrouiller" sur le formulaire de commande.
+
+==============================================================
+SUPPRIMER UN DEVIS / UNE COMMANDE
+==============================================================
+La suppression de devis et commandes est réservée à l'administrateur système.
+Les utilisateurs normaux ne peuvent pas supprimer.
+
+==============================================================
+CHAMPS SPÉCIFIQUES PARTENAIRES (CI)
+==============================================================
+Menu: Contacts → Sélectionner un contact → Onglet "Informations supplémentaires"
+
+- RCCM: Registre du Commerce et du Crédit Mobilier
+  Exemple: CI-ABJ-2023-B-12345
+  Obligatoire pour les entreprises ivoiriennes
+
+- NCC: Numéro de Compte Contribuable (identifiant fiscal DGI)
+  Exemple: 0123456A
+  Utilisé pour la FNE et les déclarations fiscales
+
+Ces champs apparaissent sur les devis, commandes et factures imprimées.
+
+==============================================================
+CONDITIONS DE PAIEMENT DISPONIBLES
+==============================================================
+Menu: Ventes → Configuration → Conditions de paiement
+
+Conditions préconfigurées:
+- Paiement immédiat
+- 30 jours fin de mois
+- 60 jours (disponible)
+- 90 jours (disponible)
+
+Appliquer sur un devis: champ "Conditions de paiement" en entête du devis
+
+==============================================================
+SUIVI DES COMMANDES
+==============================================================
+Menu: Ventes → Commandes
+
+Statuts possibles:
+- Devis: commande non encore confirmée
+- Bon de commande: commande confirmée (verrouillée)
+- Annulé: commande annulée
+
+Filtres utiles:
+- "Mes commandes": commandes de l'utilisateur connecté
+- Par client, par vendeur, par période
+
+==============================================================
+LIVRAISONS LIÉES À UNE COMMANDE
+==============================================================
+1. Ouvrir la commande confirmée
+2. Cliquer sur le bouton "Livraison" (en haut à droite)
+3. Valider la livraison une fois les produits expédiés
+4. Le statut de livraison est mis à jour automatiquement
+
+==============================================================
+FACTURER UNE COMMANDE
+==============================================================
+1. Ouvrir la commande confirmée et livrée
+2. Cliquer sur "Créer la facture"
+3. Choisir: facture complète ou acompte
+4. La facture est préremplie avec les lignes de la commande
+5. Confirmer et envoyer la facture → certification FNE automatique si activée

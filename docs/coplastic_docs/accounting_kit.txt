@@ -1,0 +1,215 @@
+COMPTABILITÉ COMPLÈTE - BASE ACCOUNTING KIT (Cybrosys)
+Module: base_accounting_kit | Version Odoo: 17
+
+Ce module remplace la comptabilité Enterprise d'Odoo par une version Community complète.
+Il ajoute: immobilisations, rapports financiers, PDC (chèques différés),
+suivi client (follow-up), paiements récurrents, verrouillage de période, limite de crédit.
+
+==============================================================
+IMMOBILISATIONS (ACTIFS)
+==============================================================
+
+ACCÉDER AUX IMMOBILISATIONS:
+Menu: Comptabilité → Écritures et rapports → Actifs
+
+CRÉER UNE CATÉGORIE D'ACTIF (configuration préalable):
+Menu: Paramètres → Comptabilité → Actifs et Produits différés → Nouveau
+  - Nom de la catégorie (ex: Matériel informatique, Véhicules)
+  - Type: Achat (actifs) ou Vente (produits différés)
+  - Compte d'actif: compte au bilan
+  - Compte d'amortissement: compte de dépréciation (bilan)
+  - Compte de charge d'amortissement: compte de charge (résultat)
+  - Méthode: Linéaire ou Dégressif
+  - Durée: nombre de périodes ou date de fin
+
+CRÉER UNE IMMOBILISATION:
+1. Comptabilité → Écritures et rapports → Actifs → Nouveau
+2. Renseigner:
+   - Nom de l'immobilisation
+   - Catégorie d'actif (détermine les comptes et la méthode)
+   - Date d'acquisition
+   - Fournisseur
+   - Valeur brute (coût d'acquisition)
+   - Valeur résiduelle (valeur en fin de vie)
+3. Cliquer "Confirmer" → passe en état "En cours"
+4. Cliquer "Calculer l'amortissement" → génère le tableau d'amortissement
+
+TABLEAU D'AMORTISSEMENT:
+Onglet "Tableau d'amortissement" sur la fiche immobilisation
+  - Date d'amortissement, Valeur amortie, Montant, Valeur résiduelle, État écriture
+  - Cocher les lignes pour valider les amortissements
+
+VALIDER LES AMORTISSEMENTS DU MOIS:
+Menu: Comptabilité → Écritures et rapports → Générer les écritures → Générer les écritures d'actifs
+  - Sélectionner le mois
+  - Valider → génère les écritures comptables d'amortissement
+
+MODIFIER UN AMORTISSEMENT:
+Ouvrir l'immobilisation → Bouton "Modifier l'amortissement"
+  - Changer: nombre d'entrées, date de fin, période
+
+CÉDER / METTRE AU REBUT UNE IMMOBILISATION:
+Ouvrir l'immobilisation → Bouton "Vendre ou mettre au rebut"
+  → L'immobilisation passe en état "Clôturé"
+
+ÉTATS D'UNE IMMOBILISATION:
+- Brouillon: modifiable, pas encore confirmée
+- En cours (Open): amortissements en cours
+- Clôturé: cédée ou mise au rebut
+
+==============================================================
+RAPPORTS FINANCIERS - ÉTATS GÉNÉRIQUES
+==============================================================
+
+COMPTE DE RÉSULTAT (Profits et Pertes):
+Menu: Comptabilité → Rapports → États génériques → Compte de résultat
+  - Dates: du... au...
+  - Mouvements cibles: comptabilisés / brouillons / tous
+  - Afficher débit/crédit
+  → Bouton "Imprimer" → PDF
+
+BILAN:
+Menu: Comptabilité → Rapports → États génériques → Bilan
+  - Mêmes paramètres que le compte de résultat
+  → Bouton "Imprimer" → PDF
+
+TABLEAU DES FLUX DE TRÉSORERIE:
+Menu: Comptabilité → Rapports → États génériques → Tableau des flux de trésorerie
+  - Comparaison optionnelle avec une autre période
+  → Bouton "Imprimer" → PDF
+
+==============================================================
+RAPPORTS D'AUDIT
+==============================================================
+
+GRAND LIVRE:
+Menu: Comptabilité → Rapports → Rapports d'audit → Grand livre
+  - Dates, mouvements cibles
+  - Trier par: code de compte ou date
+  - Afficher les comptes: tous / avec écritures / avec solde
+  - Inclure le solde initial
+  → Bouton "Imprimer" → PDF détaillé avec solde progressif par compte
+
+BALANCE GÉNÉRALE (Balance de vérification):
+Menu: Comptabilité → Rapports → Rapports d'audit → Balance de vérification
+  - Dates, mouvements cibles
+  - Colonnes: débit / crédit par compte
+  → Bouton "Imprimer" → PDF
+
+GRAND LIVRE PARTENAIRES:
+Menu: Comptabilité → Rapports → Rapports partenaires → Grand livre partenaires
+  - Filtre: clients / fournisseurs / les deux
+  - Option: afficher en devise étrangère
+  - Filtre: réconciliés / non réconciliés
+  → PDF par client/fournisseur
+
+BALANCE ÂGÉE DES PARTENAIRES:
+Menu: Comptabilité → Rapports → Balance âgée des partenaires
+  - Date d'analyse, durée de période (ex: 30 jours)
+  - Filtre: clients / fournisseurs / les deux
+  - Colonnes: Courant, +30j, +60j, +90j, +120j
+  → PDF avec analyse de retard de paiement
+
+AUDIT DES JOURNAUX:
+Menu: Comptabilité → Rapports → Rapports d'audit → Audit des journaux
+  - Dates, mouvements cibles, tri
+  → PDF des écritures par journal
+
+RAPPORT DE TAXES:
+Menu: Comptabilité → Rapports → Rapports d'audit → Rapport de taxes
+  → Récapitulatif des taxes par période
+
+==============================================================
+RAPPORTS JOURNALIERS (LIVRES COMPTABLES)
+==============================================================
+
+LIVRE DE BANQUE:
+Menu: Comptabilité → Rapports → Rapports journaliers → Livre de banque
+  - Sélectionner les journaux bancaires
+  - Dates, tri, solde initial
+  → PDF des transactions bancaires en format livre
+
+LIVRE DE CAISSE:
+Menu: Comptabilité → Rapports → Rapports journaliers → Livre de caisse
+  - Sélectionner les journaux de caisse
+  → PDF des transactions de caisse
+
+LIVRE JOURNALIER:
+Menu: Comptabilité → Rapports → Rapports journaliers → Livre journalier
+  → PDF récapitulatif journalier des transactions
+
+==============================================================
+GESTION DES CHÈQUES DIFFÉRÉS (PDC)
+==============================================================
+
+CRÉER UN PAIEMENT PDC:
+1. Comptabilité → Paiements → Nouveau
+2. Méthode de paiement: sélectionner "PDC" (entrant ou sortant)
+3. Renseigner:
+   - Date effective (date d'encaissement du chèque)
+   - Numéro de chèque
+   - Montant en lettres (auto-calculé)
+   - Référence bancaire
+4. Valider le paiement
+5. Bouton "Imprimer le chèque" si nécessaire
+6. Bouton "Marquer comme envoyé" pour confirmer l'envoi
+
+==============================================================
+SUIVI DES RELANCES CLIENTS (FOLLOW-UP)
+==============================================================
+
+CONFIGURER LES NIVEAUX DE RELANCE:
+Menu: Paramètres → Comptabilité → Niveaux de relance
+  - Définir les délais: 15j, 30j, 45j...
+  - Configurer les actions par délai
+
+CONSULTER LES RELANCES EN ATTENTE:
+Menu: Comptabilité → Clients → Rapports de relance
+  - Filtres: factures en retard / action requise / aucune action
+  - Colonnes: Client, Total dû, Total en retard, Statut, Prochaine relance
+  - Cliquer sur un client pour voir le détail des factures en retard
+
+==============================================================
+PAIEMENTS RÉCURRENTS
+==============================================================
+
+CRÉER UN MODÈLE DE PAIEMENT RÉCURRENT:
+Menu: Paiements → Modèles récurrents → Nouveau
+  - Nom du modèle
+  - Fréquence (mensuel, trimestriel...)
+  - Intervalle entre récurrences
+  - Partenaire, montant
+  - Comptes débit/crédit, journal
+  - Date de début et prochaine date
+
+==============================================================
+VERROUILLAGE DES PÉRIODES
+==============================================================
+Menu: Comptabilité → Écritures et rapports → Actions → Verrouiller les dates
+
+  - Date de verrouillage de période: bloque les écritures avant cette date
+  - Date de verrouillage de l'exercice: bloque tout l'exercice fiscal
+
+==============================================================
+LIMITE DE CRÉDIT CLIENT
+==============================================================
+Sur la fiche client (Contacts → Client):
+  - Activer la limite de crédit
+  - Définir le montant limite
+  - Seuil d'avertissement: alerte quand on approche la limite
+  - Seuil de blocage: bloque les transactions si dépassé
+L'alerte apparaît sur les devis et les factures.
+
+==============================================================
+GROUPES DE COMPTES
+==============================================================
+Menu: Paramètres → Comptes → Groupes de comptes
+  - Regrouper les comptes pour les rapports financiers
+  - Hiérarchie configurable
+
+==============================================================
+BUDGET
+==============================================================
+(voir aussi documentation budget.txt pour le détail)
+Menu: Comptabilité → Écritures et rapports → Budgets
+  - Créer, confirmer, valider et suivre les budgets

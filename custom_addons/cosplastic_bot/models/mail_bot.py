@@ -77,60 +77,8 @@ class MailBotCoplastic(models.AbstractModel):
             'system_prompt': SYSTEM_PROMPT
         }
 
-    def _is_technical_question(self, prompt):
-        """Détermine si la question est technique (développement)"""
-        technical_keywords = [
-            'orm', 'model', 'field', 'api.', '@api', 'compute', 'onchange',
-            'xml', 'qweb', 'view', 'kanban', 'tree view', 'form view',
-            'javascript', 'owl', 'component', 'widget', 'registry',
-            'module', 'manifest', 'inherit', 'extension',
-            'python', 'code', 'fonction', 'méthode', 'class',
-            'security', 'access rights', 'record rules', 'ir.rule',
-            'report', 'pdf', 'template',
-            'migration', 'upgrade', 'hook',
-            'debug', 'log', 'erreur technique',
-            'créer un module', 'développer', 'coder',
-        ]
-        prompt_lower = prompt.lower()
-        return any(kw in prompt_lower for kw in technical_keywords)
-
-    def _get_assistant_response(self, prompt, force_type=None):
-        """Utilise l'Assistant OpenAI avec RAG pour répondre"""
-        try:
-            Assistant = self.env['cosplastic.assistant']
-
-            # Déterminer le type d'assistant à utiliser
-            if force_type:
-                assistant_type = force_type
-            elif self._is_technical_question(prompt):
-                assistant_type = 'technical'
-            else:
-                assistant_type = 'functional'
-
-            assistant = Assistant.get_active_assistant(assistant_type)
-
-            # Fallback sur l'autre type si pas trouvé
-            if not assistant:
-                other_type = 'functional' if assistant_type == 'technical' else 'technical'
-                assistant = Assistant.get_active_assistant(other_type)
-
-            if assistant:
-                response = assistant.get_response(prompt)
-                if response:
-                    return response
-        except Exception as e:
-            _logger.warning(f"Assistant non disponible, fallback sur ChatGPT direct: {e}")
-
-        return None
-
     def _get_chatgpt_response(self, prompt, context_prompt=None):
         """Appelle l'API ChatGPT et retourne la réponse"""
-        # Essayer d'abord l'Assistant avec RAG
-        assistant_response = self._get_assistant_response(prompt)
-        if assistant_response:
-            return assistant_response
-
-        # Fallback sur ChatGPT direct
         if not OpenAI:
             return "Désolé, le module openai n'est pas installé."
 
@@ -201,18 +149,6 @@ class MailBotCoplastic(models.AbstractModel):
         # Commande /aide ou /help
         if command in ('aide', 'help'):
             return self._get_help_message()
-
-        # Commande /tech pour questions techniques
-        if command == 'tech':
-            user_query = body.strip() if body.strip() else "Comment créer un module Odoo?"
-            try:
-                response = self._get_assistant_response(user_query, force_type='technical')
-                if not response:
-                    response = self._get_chatgpt_response(user_query)
-                return self._format_chatgpt_response(response)
-            except Exception as e:
-                _logger.error(f"Erreur commande tech: {str(e)}")
-                return Markup(_("<p>Erreur lors de la réponse technique.</p>"))
 
         # Commandes avec contexte ChatGPT
         if command in COMMAND_PROMPTS:
@@ -339,8 +275,6 @@ class MailBotCoplastic(models.AbstractModel):
             "<li><b>/facture</b> - Créer une facture</li>"
             "<li><b>/commande</b> - Créer une commande</li>"
             "<li><b>/produit</b> - Gérer les produits</li>"
-            "<li><b>/tech</b> - Questions techniques (développement Odoo)</li>"
             "</ul>"
             "<p>Vous pouvez aussi me poser des questions directement !</p>"
-            "<p><i>Astuce: les questions techniques (ORM, vues, JavaScript) sont automatiquement redirigées vers l'assistant technique.</i></p>"
         ))

@@ -1,0 +1,108 @@
+RAPPROCHEMENT AUTOMATIQUE DES PAIEMENTS
+Module: coplastic_auto_reconcile | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+Ce module automatise le rapprochement (lettrage) des paiements avec le compte
+de transit (compte d'attente). Lors de la validation d'un paiement, une écriture
+de contrepartie est créée et le lettrage avec le compte de transit est effectué
+automatiquement.
+
+==============================================================
+CONFIGURER UN JOURNAL POUR LE RAPPROCHEMENT AUTO
+==============================================================
+Menu: Facturation → Configuration → Journaux → Sélectionner un journal
+
+1. Ouvrir le journal (ex: Banque, Caisse)
+2. Cocher la case "Rapprochement automatique"
+3. S'assurer que le journal a:
+   - Un compte de transit configuré (compte d'attente/suspense)
+   - Un compte principal configuré
+4. Sauvegarder
+
+Une fois activé, tout paiement enregistré dans ce journal sera
+automatiquement lettré.
+
+==============================================================
+FLUX DE RAPPROCHEMENT AUTOMATIQUE
+==============================================================
+
+Sans rapprochement auto (comportement standard Odoo):
+1. Paiement créé → écriture dans compte de transit
+2. Relevé bancaire importé → écriture dans compte banque
+3. Lettrage manuel nécessaire entre les deux écritures
+
+Avec rapprochement auto (module coplastic_auto_reconcile):
+1. Paiement validé → écriture dans compte de transit
+2. AUTOMATIQUEMENT: écriture de contrepartie créée dans compte banque
+3. AUTOMATIQUEMENT: les deux écritures sont lettrées (rapprochées)
+4. Résultat: solde du compte de transit = 0 immédiatement
+
+==============================================================
+BOUTONS DISPONIBLES SUR UN PAIEMENT
+==============================================================
+Menu: Facturation → Paiements → Sélectionner un paiement
+
+Après validation du paiement:
+- Bouton "Voir l'écriture de rapprochement": ouvre l'écriture de contrepartie
+  créée automatiquement
+
+Si le paiement est validé mais le journal n'a pas l'option auto-rapprochement:
+- Bouton "Rapprocher manuellement": déclenche manuellement le rapprochement
+
+==============================================================
+VÉRIFIER LES ÉCRITURES DE RAPPROCHEMENT
+==============================================================
+Menu: Facturation → Comptabilité → Grand Livre
+
+Filtrer par compte de transit (compte d'attente):
+- Le solde devrait être proche de zéro si le rapprochement auto fonctionne
+- Les lignes lettrées apparaissent avec un indicateur de lettrage (ex: A, B, C...)
+
+Menu: Facturation → Paiements → Sélectionner un paiement → Onglet "Pièces comptables"
+- Voir toutes les écritures liées au paiement
+- La colonne "Lettrage" indique les lignes lettrées
+
+==============================================================
+DÉPANNAGE
+==============================================================
+
+Rapprochement non effectué:
+- Vérifier que "Rapprochement automatique" est coché sur le journal
+- Vérifier que le journal a un compte de transit configuré
+- Vérifier que le journal a un compte principal configuré
+- Vérifier les logs: le module signale les problèmes dans les logs Odoo
+
+Message "Compte de transit introuvable":
+→ Configurer le compte de transit: Journal → Onglet Paiements entrants/sortants
+
+Message "Compte principal introuvable":
+→ Configurer le compte principal du journal
+
+Message "Le compte ne permet pas le lettrage":
+→ Sur la fiche du compte: activer "Peut être lettré" (champ Réconciliation)
+→ Menu: Facturation → Configuration → Plan comptable → Sélectionner le compte
+
+==============================================================
+CONSULTATION DU JOURNAL DE BANQUE
+==============================================================
+Menu: Facturation → Comptabilité → Journaux → (sélectionner journal Banque)
+
+Vue tableau de bord:
+- Solde actuel du compte bancaire
+- Paiements en attente de lettrage (si rapprochement auto est actif, devrait être 0)
+- Dernières transactions
+
+Rapprochement bancaire standard (relevé):
+Menu: Facturation → Comptabilité → Rapprochement bancaire
+Permet d'importer les relevés bancaires et de valider les correspondances.
+
+==============================================================
+NOTES IMPORTANTES
+==============================================================
+- Ce module complète (ne remplace pas) le rapprochement bancaire standard Odoo
+- Le rapprochement se fait sur le compte de transit seulement
+- Pour le rapprochement avec le relevé bancaire réel: utiliser la fonction
+  standard Odoo "Rapprochement bancaire"
+- En cas de paiement annulé: l'écriture de rapprochement est également annulée

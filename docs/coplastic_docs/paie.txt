@@ -1,0 +1,104 @@
+PAIE CÔTE D'IVOIRE (CNPS / ITS / CMU)
+Module: l10n_ci_hr_payroll | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+Module de localisation de la paie pour la Côte d'Ivoire.
+Calcule automatiquement les cotisations CNPS, l'ITS (Impôt sur Traitements et Salaires),
+la CMU (Couverture Maladie Universelle) et les taxes patronales conformément
+au droit du travail ivoirien et à la Convention Collective Interprofessionnelle.
+
+==============================================================
+CONFIGURATION DE L'EMPLOYÉ
+==============================================================
+Menu: Employés → Sélectionner un employé → Onglet "Informations privées" ou "RH"
+
+Champs spécifiques Côte d'Ivoire:
+- Matricule: numéro interne de l'employé
+- Numéro CNPS: numéro d'immatriculation CNPS de l'employé
+- Catégorie professionnelle: ex. 8B, 6A (selon la convention collective)
+- Qualification: manœuvre / ouvrier / employé / agent de maîtrise / cadre / cadre supérieur
+- Parts IGR: nombre de parts pour l'ITS (1.0 = célibataire, +0.5 par enfant à charge)
+- Nombre d'enfants: détermine les parts IGR automatiquement
+- Convention collective: par défaut "Convention Collective Interprofessionnelle"
+- Banque / Numéro de compte: pour le virement du salaire
+
+==============================================================
+CONFIGURATION DU CONTRAT
+==============================================================
+Menu: Employés → Sélectionner un employé → Contrats → Nouveau contrat
+
+Champs spécifiques Côte d'Ivoire:
+- Sursalaire: complément de salaire au-delà du salaire catégoriel de base
+- Prime de transport: allocation transport (défaut: 30 000 FCFA/mois pour Abidjan)
+- Taux d'ancienneté: pourcentage de prime d'ancienneté (0% à 25% maximum)
+- Indemnité de congé journalière: montant journalier pour les congés payés
+- Horaire mensuel: heures travaillées par mois (défaut: 173.33h = 40h/semaine)
+
+==============================================================
+CRÉER UN BULLETIN DE PAIE
+==============================================================
+1. Aller dans: Paie → Bulletins de paie → Nouveau
+   OU: Paie → Bulletins → Créer des bulletins en masse
+2. Sélectionner l'employé
+3. Définir la période (mois/année)
+4. Cliquer sur "Calculer la feuille" pour recalculer les montants
+5. Vérifier les lignes calculées:
+   - Salaire de base
+   - Primes (transport, ancienneté, sursalaire)
+   - Cotisations salariales (CNPS, ITS, CMU)
+   - Charges patronales (CNPS employeur, taxe apprentissage, FPC)
+   - Net à payer
+6. Cliquer sur "Valider" pour confirmer le bulletin
+
+==============================================================
+CALCULS AUTOMATIQUES
+==============================================================
+
+CNPS (Caisse Nationale de Prévoyance Sociale):
+- Retraite salarié: 3.6% du salaire brut plafonné
+- Prestations familiales (employeur): 5.75%
+- Accidents du travail (employeur): taux selon secteur
+- Retraite employeur: 4.8%
+Plafond CNPS: défini réglementairement (vérifier les taux en vigueur)
+
+ITS (Impôt sur Traitements et Salaires):
+- Barème progressif annuel sur 11 tranches
+- De 0% jusqu'à 300 000 FCFA/an
+- Jusqu'au taux maximal sur les revenus > 13 500 000 FCFA/an
+- Abattement familial: réduction selon les parts IGR (max 10%)
+- Conversion automatique annuel → mensuel
+
+CMU (Couverture Maladie Universelle):
+- Cotisation mensuelle fixe selon la réglementation
+
+TAXES PATRONALES:
+- Taxe d'apprentissage
+- Formation Professionnelle Continue (FPC)
+
+==============================================================
+LIVRES DE PAIE ET RAPPORTS
+==============================================================
+Menu: Paie → Rapports
+
+- Livre de paie: récapitulatif mensuel de tous les bulletins
+- Récapitulatif CNPS: déclaration mensuelle pour la CNPS
+- État des charges patronales
+
+==============================================================
+DÉPANNAGE
+==============================================================
+Montant ITS incorrect: vérifier les parts IGR sur la fiche employé
+CNPS non calculé: vérifier que le numéro CNPS est renseigné sur l'employé
+Solde de congé erroné: vérifier le taux d'ancienneté sur le contrat
+Bulletin non calculé: s'assurer que le contrat est actif sur la période
+
+==============================================================
+CONVENTIONS ET RÉGLEMENTATION
+==============================================================
+Ce module est conforme à:
+- La Convention Collective Interprofessionnelle de Côte d'Ivoire
+- Le Code du Travail ivoirien
+- Les taux CNPS en vigueur
+- Le barème ITS de la DGI

@@ -1,0 +1,99 @@
+FACTURATION NORMALISÉE ÉLECTRONIQUE (FNE) - CÔTE D'IVOIRE
+Module: l10n_ci_fne | Version Odoo: 17
+
+==============================================================
+DESCRIPTION
+==============================================================
+Le module FNE permet la certification électronique des factures auprès de la DGI
+(Direction Générale des Impôts) de Côte d'Ivoire, conformément à la réglementation
+sur la Facturation Normalisée Électronique.
+
+==============================================================
+CONFIGURATION INITIALE
+==============================================================
+Menu: Paramètres → Comptabilité → Facturation Normalisée Électronique (FNE)
+
+Paramètres à renseigner:
+- Clé API DGI: fournie par la DGI après certification
+- URL de l'API: URL de l'endpoint DGI (production ou test)
+- NCC (Numéro de Compte Contribuable): identifiant fiscal de l'entreprise
+- Point de vente: code du point de vente attribué par la DGI
+- Établissement: code de l'établissement
+- Mode simulation: activer pour les tests sans envoi réel à la DGI
+- Certification automatique: si activée, les factures sont certifiées à la validation
+
+==============================================================
+CERTIFIER UNE FACTURE
+==============================================================
+
+MÉTHODE AUTOMATIQUE (recommandée):
+1. Créer la facture normalement: Facturation → Factures clients → Nouveau
+2. Remplir les informations client, produits, taxes
+3. Cliquer sur "Confirmer" → la certification DGI se fait automatiquement
+4. Le numéro FNE et le QR Code apparaissent sur la facture
+
+MÉTHODE MANUELLE (si la certification automatique est désactivée):
+1. Valider la facture normalement (statut: Comptabilisée)
+2. Cliquer sur le bouton "Certifier FNE" sur la facture
+3. Le système envoie la facture à l'API DGI
+4. En cas de succès: le champ "Référence FNE" est rempli et le QR Code généré
+
+==============================================================
+CHAMPS FNE SUR LA FACTURE
+==============================================================
+- Référence FNE: numéro de facture normalisée attribué par la DGI
+- Token FNE: URL de vérification de la facture
+- QR Code FNE: image QR générée à partir du token, imprimée sur la facture PDF
+- Certifiée: indicateur booléen (Oui/Non)
+- Date de certification: horodatage de la certification DGI
+- Message d'erreur: affiché si la certification a échoué
+- Mode simulation: indique si la certification est en mode test
+
+==============================================================
+AVOIRS (NOTES DE CRÉDIT)
+==============================================================
+1. Ouvrir la facture originale certifiée
+2. Cliquer sur "Ajouter avoir" ou "Rembourser"
+3. Remplir les informations de l'avoir
+4. Confirmer → l'avoir est certifié en référençant la facture originale
+5. La DGI est notifiée du lien avoir ↔ facture originale
+
+==============================================================
+TYPES DE TRANSACTIONS DÉTECTÉS AUTOMATIQUEMENT
+==============================================================
+- B2B: client est une entreprise ivoirienne (avec NCC)
+- B2C: client est un particulier
+- B2G: client est une administration gouvernementale
+- B2F: client est étranger (hors Côte d'Ivoire)
+La détection est automatique selon le type de partenaire configuré.
+
+==============================================================
+GESTION DES DEVISES
+==============================================================
+Les factures en devises étrangères sont supportées.
+Le taux de change au moment de la certification est transmis à la DGI.
+Menu de consultation des taux: Facturation → Configuration → Devises
+
+==============================================================
+MAPPING DES TAXES
+==============================================================
+Les taxes Odoo sont mappées automatiquement vers les types FNE:
+- TVA 18% → Type TVA standard
+- TVA 9% (taux réduit) → Type TVAB
+- TVA 0% (exonéré) → Type TVAC
+Configurer les taxes: Facturation → Configuration → Taxes
+
+==============================================================
+DÉPANNAGE
+==============================================================
+Erreur "Clé API invalide": vérifier la clé dans Paramètres → FNE
+Erreur "NCC non trouvé": vérifier que le NCC de l'entreprise est correct
+Facture non certifiée: vérifier le champ "Message d'erreur" sur la facture
+Mode simulation: désactiver pour les factures de production réelles
+
+==============================================================
+RAPPORT PDF
+==============================================================
+Le QR Code FNE et le numéro de facture normalisée sont automatiquement
+intégrés dans le PDF de la facture lors de l'impression.
+Imprimer: Ouvrir la facture → Imprimer → Facture

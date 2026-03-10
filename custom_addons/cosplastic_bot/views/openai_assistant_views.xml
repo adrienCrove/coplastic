@@ -22,7 +22,7 @@
                             string="Uploader la Documentation"
                             type="object"
                             class="btn-primary"
-                            invisible="not assistant_id"/>
+                            invisible="not vector_store_id"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,configured"/>
                 </header>
                 <sheet>
@@ -37,12 +37,12 @@
                         </h1>
                     </div>
                     <group>
-                        <group string="Configuration">
-                            <field name="assistant_type" widget="radio" options="{'horizontal': true}"/>
+                        <group string="Configuration OpenAI">
                             <field name="model"/>
-                        </group>
-                        <group string="OpenAI">
                             <field name="assistant_id" readonly="1"/>
+                            <field name="vector_store_id" readonly="1"/>
+                        </group>
+                        <group string="Informations">
                             <field name="last_sync"/>
                             <field name="error_message" invisible="not error_message" readonly="1"/>
                         </group>
@@ -56,14 +56,8 @@
                                 <h4>Comment configurer l'Assistant IA</h4>
                                 <ol>
                                     <li><strong>Configurez la clé API OpenAI</strong> dans Paramètres → Paramètres généraux → OdooBot (ChatGPT)</li>
-                                    <li><strong>Choisissez le type d'assistant:</strong>
-                                        <ul>
-                                            <li><strong>Fonctionnel</strong>: Pour les utilisateurs - aide sur les ventes, stocks, factures, CRM</li>
-                                            <li><strong>Technique</strong>: Pour les développeurs - ORM, vues, JavaScript, sécurité</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>Cliquez sur "Créer/Configurer l'Assistant"</strong> pour créer l'assistant sur OpenAI</li>
-                                    <li><strong>Cliquez sur "Uploader la Documentation"</strong> pour envoyer la documentation correspondante</li>
+                                    <li><strong>Cliquez sur "Créer/Configurer l'Assistant"</strong> pour créer l'assistant et le Vector Store sur OpenAI</li>
+                                    <li><strong>Cliquez sur "Uploader la Documentation"</strong> pour envoyer la documentation Odoo 17 vers OpenAI</li>
                                     <li><strong>Testez</strong> en posant des questions à OdooBot dans Discuss!</li>
                                 </ol>
                                 <p class="mt-3">
@@ -87,7 +81,6 @@
         <field name="arch" type="xml">
             <tree string="Assistants IA">
                 <field name="name"/>
-                <field name="assistant_type" widget="badge" decoration-info="assistant_type == 'functional'" decoration-warning="assistant_type == 'technical'"/>
                 <field name="model"/>
                 <field name="state" widget="badge" decoration-success="state == 'configured'" decoration-warning="state == 'draft'" decoration-danger="state == 'error'"/>
                 <field name="files_count"/>
