@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form_coda_sale" model="ir.ui.view">
+        <field name="name">sale.order.form.coda</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Boutons Coda Devis / Bon de Commande dans le header -->
+            <xpath expr="//field[@name='state'][@widget='statusbar']" position="before">
+                <button name="%(coda_sale_order.coda_devis)d"
+                        string="Coda Devis" type="action"
+                        class="btn-secondary" icon="fa-print"
+                        invisible="state in ['sale', 'done']"/>
+                <button name="%(coda_sale_order.coda_bon_commande)d"
+                        string="Bon de Commande" type="action"
+                        class="btn-secondary" icon="fa-print"
+                        invisible="state not in ['sale', 'done']"/>
+            </xpath>
+
+            <!-- N° DA et Coefficient de sélectivité dans l'en-tête -->
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="numero_da" string="N° DA"
+                       readonly="state in ['sale', 'done', 'cancel']"/>
+                <field name="coefficient_selectivite" string="Coefficient de sélectivité"
+                       readonly="state in ['sale', 'done', 'cancel']"/>
+            </xpath>
+
+            <!-- Bouton import Excel + Supprimer lignes -->
+            <xpath expr="//div[@name='so_button_below_order_lines']" position="inside">
+                <button string="Importer Excel"
+                        name="%(coda_sale_order.action_sale_order_import_wizard)d"
+                        type="action" class="btn btn-secondary"
+                        context="{'default_order_id': id}"
+                        icon="fa-file-excel-o"
+                        invisible="state not in ['draft', 'sent']"/>
+                <button string="Supprimer les lignes"
+                        name="action_delete_order_lines" type="object"
+                        class="btn btn-danger" icon="fa-trash"
+                        confirm="Voulez-vous supprimer toutes les lignes de ce devis ?"
+                        invisible="state not in ['draft', 'sent']"/>
+            </xpath>
+
+            <!-- Lignes en readonly après confirmation -->
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="readonly">state in ['sale', 'done', 'cancel']</attribute>
+            </xpath>
+
+            <!-- Masquer la colonne Description par défaut -->
+            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <!-- Renommer "Prix unitaire" → "Prix de vente" dans la liste -->
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position="attributes">
+                <attribute name="string">Prix de vente</attribute>
+            </xpath>
+
+            <!-- Prix de revient + Coef ligne AVANT le prix de vente -->
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position="before">
+                <field name="prix_de_revient" string="Prix de revient"
+                       column_invisible="parent.state == 'cancel'"/>
+                <field name="coefficient_selectivite" string="Coef ligne"
+                       column_invisible="parent.state == 'cancel'"/>
+            </xpath>
+
+            <!-- Remise + Marge APRÈS le prix de vente -->
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position="after">
+                <field name="discount" string="Remise (%)"
+                       column_invisible="parent.state == 'cancel'"/>
+                <field name="prix_de_marge" string="Marge"
+                       column_invisible="parent.state == 'cancel'"/>
+            </xpath>
+
+            <!-- Marge totale dans le bloc des totaux, avant la TVA -->
+            <xpath expr="//group[@name='sale_total']//field[@name='tax_totals']" position="before">
+                <field name="marge_totale" string="Marge totale"
+                       widget="monetary"
+                       options="{'currency_field': 'currency_id'}"
+                       readonly="1"/>
+            </xpath>
+
+            <!-- Dans le formulaire popup de la ligne -->
+            <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="attributes">
+                <attribute name="string">Prix de vente</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="before">
+                <field name="prix_de_revient" string="Prix de revient"/>
+                <field name="coefficient_selectivite" string="Coef ligne"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="after">
+                <field name="discount" string="Remise (%)"/>
+                <field name="prix_de_marge" string="Marge" readonly="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

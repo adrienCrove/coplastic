@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Séquence Devis : préfixe F (ex: F00001) -->
+    <record id="sequence_coda_sale_quotation" model="ir.sequence">
+        <field name="name">Coda Devis</field>
+        <field name="code">coda.sale.quotation</field>
+        <field name="prefix">F</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Séquence Bon de commande : préfixe BCFK (ex: BCFK00001) -->
+    <record id="sequence_coda_sale_order" model="ir.sequence">
+        <field name="name">Coda Bon de Commande</field>
+        <field name="code">coda.sale.order</field>
+        <field name="prefix">BCFK</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

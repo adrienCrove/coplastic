@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_order_import_wizard,sale.order.import.wizard,model_sale_order_import_wizard,base.group_user,1,1,1,1
+access_sale_order_import_config,sale.order.import.config,model_sale_order_import_config,base.group_user,1,1,1,1
+access_sale_import_config_save_wizard,sale.order.import.config.save.wizard,model_sale_order_import_config_save_wizard,base.group_user,1,1,1,1

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =========================================================
+         Paper format personnalisé (marges réduites, sans header Odoo)
+    ========================================================= -->
+    <record id="paperformat_coda_devis" model="report.paperformat">
+        <field name="name">Coda Devis A4</field>
+        <field name="default">False</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line">False</field>
+        <field name="header_spacing">3</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- =========================================================
+         Action rapport
+    ========================================================= -->
+    <record id="coda_devis" model="ir.actions.report">
+        <field name="name">Coda Devis</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coda_sale_order.report_coda_devis_document</field>
+        <field name="report_file">coda_sale_order.report_coda_devis_document</field>
+        <field name="print_report_name">'Proforma-%s' % (object.name)</field>
+        <field name="paperformat_id" ref="coda_sale_order.paperformat_coda_devis"/>
+    </record>
+
+    <!-- =========================================================
+         Template QWeb
+         - Logos : fournis en base64 via _get_report_values (évite l'accès HTTP wkhtmltopdf)
+         - Montants : formatés en Python pur pour éviter les Â (espaces insécables UTF-8)
+    ========================================================= -->
+    <template id="report_coda_devis_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="
+                    font-family: Arial, 'Liberation Sans', sans-serif;
+                    font-size: 11px;
+                    color: #222222;
+                    padding: 4mm 8mm 55mm 8mm;
+                    position: relative;
+                    min-height: 262mm;
+                ">
+
+
+                    <!-- ==============================================
+                         EN-TÊTE : Logos (gauche) | Infos société (droite)
+                    ============================================== -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr>
+                            <!-- Logos empilés à gauche -->
+                            <td style="width: 30%; vertical-align: top; padding-right: 10px;">
+                                <img t-if="logo_coda" t-att-src="logo_coda"
+                                     style="max-height: 80px; max-width: 155px; display: block; margin-bottom: 6px;"/>
+                                <img t-if="logo_mase" t-att-src="logo_mase"
+                                     style="max-height: 50px; max-width: 100px; display: block;"/>
+                            </td>
+                            <!-- Infos société à droite -->
+                            <td style="width: 70%; vertical-align: top; text-align: right; font-size: 11px; line-height: 1.6; font-family: Arial, sans-serif;">
+                                <strong style="font-size: 12px;">
+                                    <span t-esc="o.company_id.name"/>
+                                </strong><br/>
+                                <t t-if="o.company_id.street">
+                                    <span t-esc="o.company_id.street"/><br/>
+                                </t>
+                                <t t-if="o.company_id.zip or o.company_id.city">
+                                    <span t-esc="(o.company_id.zip or '') + ' ' + (o.company_id.city or '')"/><br/>
+                                </t>
+                                <t t-if="o.company_id.country_id">
+                                    <span t-esc="o.company_id.country_id.name"/><br/>
+                                </t>
+                                <t t-if="o.company_id.company_registry">
+                                    R.C. N&#176; <span t-esc="o.company_id.company_registry"/><br/>
+                                </t>
+                                <t t-if="o.company_id.phone">
+                                    TEL : <span t-esc="o.company_id.phone"/><br/>
+                                </t>
+                                <t t-if="o.company_id.email">
+                                    E-mail : <span t-esc="o.company_id.email"/><br/>
+                                </t>
+                                <t t-if="o.company_id.vat">
+                                    CC : <span t-esc="o.company_id.vat"/>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ==============================================
+                         INFORMATIONS CLIENT  (70% vide | 30% infos client à droite)
+                    ============================================== -->
+                    <table style="width: 100%; border-collapse: collapse; margin: 6px 0 10px 0;">
+                        <tr>
+                            <td style="width: 70%;"/>
+                            <td style="width: 30%; vertical-align: top; text-align: left; line-height: 1.7; font-family: Arial, sans-serif; font-size: 11px;">
+                                <strong style="font-size: 12px;">
+                                    <span t-esc="o.partner_id.name"/>
+                                </strong><br/>
+                                <t t-if="o.partner_id.street">
+                                    <span t-esc="o.partner_id.street"/><br/>
+                                </t>
+                                <t t-if="o.partner_id.zip or o.partner_id.city">
+                                    <span t-esc="(o.partner_id.zip or '') + ' ' + (o.partner_id.city or '')"/><br/>
+                                </t>
+                                <t t-if="o.partner_id.vat">
+                                    <strong>C.C :</strong> <span t-esc="o.partner_id.vat"/>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ==============================================
+                         TITRE
+                    ============================================== -->
+                    <div style="margin: 10px 0 8px 0;">
+                        <span style="font-size: 25px; font-weight: bold; font-family: Arial, sans-serif; letter-spacing: 1px;">
+                            PROFORMA CLIENT
+                        </span>
+                    </div>
+
+                    <!-- ==============================================
+                         TABLEAU NUMÉRO / DATE / NUMÉRO DA
+                    ============================================== -->
+                    <table style="border-collapse: collapse; margin-bottom: 12px; width: 65%;">
+                        <tr style="background-color: #ebebeb;">
+                            <th style="border: 1px solid #999999; padding: 5px 14px; text-align: center; font-size: 10px; font-family: Arial, sans-serif;">Numero</th>
+                            <th style="border: 1px solid #999999; padding: 5px 14px; text-align: center; font-size: 10px; font-family: Arial, sans-serif;">Date</th>
+                            <th style="border: 1px solid #999999; padding: 5px 14px; text-align: center; font-size: 10px; font-family: Arial, sans-serif;">Numero DA</th>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #999999; padding: 5px 14px; text-align: center; color: #1a5fad; font-weight: bold; font-family: Arial, sans-serif;">
+                                <span t-esc="o.name"/>
+                            </td>
+                            <td style="border: 1px solid #999999; padding: 5px 14px; text-align: center; font-family: Arial, sans-serif;">
+                                <span t-esc="o.date_order.strftime('%d/%m/%Y') if o.date_order else ''"/>
+                            </td>
+                            <td style="border: 1px solid #999999; padding: 5px 14px; text-align: center; font-family: Arial, sans-serif;">
+                                <span t-esc="o.client_order_ref or ''"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ==============================================
+                         TABLEAU DES LIGNES
+                    ============================================== -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+                        <thead>
+                            <tr style="background-color: #ebebeb;">
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: left;   font-size: 10px; width: 12%; font-family: Arial, sans-serif;">Reference</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: left;   font-size: 10px;            font-family: Arial, sans-serif;">Designation</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: center; font-size: 10px; width: 7%;  font-family: Arial, sans-serif;">Qte</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: right;  font-size: 10px; width: 14%; font-family: Arial, sans-serif;">Px unitaire</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: center; font-size: 10px; width: 9%;  font-family: Arial, sans-serif;">Remise (%)</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: right;  font-size: 10px; width: 14%; font-family: Arial, sans-serif;">Montant HT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.order_line" t-as="line">
+
+                                <!-- Section -->
+                                <t t-if="line.display_type == 'line_section'">
+                                    <tr>
+                                        <td colspan="6" style="padding: 6px 8px; font-weight: bold; background-color: #f5f5f5; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <!-- Note -->
+                                <t t-elif="line.display_type == 'line_note'">
+                                    <tr>
+                                        <td colspan="6" style="padding: 4px 8px; font-style: italic; color: #555555; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <!-- Ligne produit -->
+                                <t t-else="">
+                                    <tr>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.product_id.default_code or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.product_id.name or line.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: center; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="int(line.product_uom_qty)"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: right; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="'{:,.0f}'.format(line.price_unit).replace(',', ' ')"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: center; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="'{:.0f}%'.format(line.discount) if line.discount else '-'"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: right; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="'{:,.0f}'.format(line.price_subtotal).replace(',', ' ')"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- ==============================================
+                         PIED : Conditions | Totaux  (position absolue → toujours en bas)
+                    ============================================== -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 0 8mm 10mm 8mm;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 0;">
+                        <tr>
+                            <!-- Conditions -->
+                            <td style="width: 55%; vertical-align: bottom; padding-right: 10px; font-size: 10px; font-family: Arial, sans-serif;">
+                                <strong>STOCK DISPONIBLE SAUF VENTE</strong><br/><br/>
+                                <t t-if="o.payment_term_id">
+                                    <strong>Conditions de reglement :</strong> <span t-esc="o.payment_term_id.name"/><br/>
+                                </t>
+                                <t t-if="o.validity_date">
+                                    <strong>Delai de validite :</strong> <span t-esc="o.validity_date.strftime('%d/%m/%Y') if o.validity_date else ''"/>
+                                </t>
+                            </td>
+                            <!-- Totaux -->
+                            <td style="width: 45%; vertical-align: top;">
+                                <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+                                    <tr>
+                                        <td style="padding: 5px 10px; border: 1px solid #999999; background-color: #f5f5f5;">
+                                            <strong>TOTAL HT</strong>
+                                        </td>
+                                        <td style="padding: 5px 10px; text-align: right; border: 1px solid #999999; border-left: none;">
+                                            <span t-esc="'{:,.0f}'.format(o.amount_untaxed).replace(',', ' ')"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 10px; border: 1px solid #999999; border-top: none; background-color: #f5f5f5;">
+                                            <strong>T.V.A</strong>
+                                        </td>
+                                        <td style="padding: 5px 10px; text-align: right; border: 1px solid #999999; border-left: none; border-top: none;">
+                                            <span t-esc="'{:,.0f}'.format(o.amount_tax).replace(',', ' ')"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 10px; border: 2px solid #333333; background-color: #dddddd;">
+                                            <strong>NET A PAYER</strong>
+                                        </td>
+                                        <td style="padding: 6px 10px; text-align: right; border: 2px solid #333333; border-left: none; background-color: #dddddd;">
+                                            <strong>
+                                                <span t-esc="'{:,.0f}'.format(o.amount_total).replace(',', ' ')"/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

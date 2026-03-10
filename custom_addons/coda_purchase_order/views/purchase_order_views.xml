@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form_coda_purchase" model="ir.ui.view">
+        <field name="name">purchase.order.form.coda</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_rfq"/>
+        <field name="arch" type="xml">
+
+            <!-- Boutons Coda dans le header, avant la barre de statut -->
+            <xpath expr="//field[@name='state'][@widget='statusbar']" position="before">
+                <button name="%(coda_purchase_order.coda_demande_prix)d"
+                        string="Coda Demande de Prix"
+                        type="action"
+                        class="btn-secondary"
+                        icon="fa-print"
+                        invisible="state not in ['draft', 'sent']"/>
+                <button name="%(coda_purchase_order.coda_bon_commande_achat)d"
+                        string="Bon de Commande Achat"
+                        type="action"
+                        class="btn-secondary"
+                        icon="fa-print"
+                        invisible="state not in ['purchase', 'done']"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

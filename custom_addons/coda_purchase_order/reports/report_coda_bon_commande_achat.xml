@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =========================================================
+         Action rapport Bon de Commande Fournisseur
+    ========================================================= -->
+    <record id="coda_bon_commande_achat" model="ir.actions.report">
+        <field name="name">Coda Bon de Commande Achat</field>
+        <field name="model">purchase.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coda_purchase_order.report_coda_bon_commande_achat_document</field>
+        <field name="report_file">coda_purchase_order.report_coda_bon_commande_achat_document</field>
+        <field name="print_report_name">'BCA-%s' % (object.name)</field>
+        <field name="paperformat_id" ref="coda_purchase_order.paperformat_coda_purchase"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- =========================================================
+         Template QWeb — BON DE COMMANDE FOURNISSEUR
+    ========================================================= -->
+    <template id="report_coda_bon_commande_achat_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="
+                    font-family: Arial, 'Liberation Sans', sans-serif;
+                    font-size: 11px;
+                    color: #222222;
+                    padding: 4mm 8mm 10mm 8mm;
+                    position: relative;
+                    min-height: 262mm;
+                ">
+
+                    <!-- Pagination fixe en bas à droite -->
+                    <div style="position:fixed; bottom:4mm; right:6mm; font-size:9px; color:#999999;">
+                        Page <span class="page">1</span> / <span class="topage">1</span>
+                    </div>
+
+                    <!-- ==============================================
+                         EN-TÊTE : Logos (gauche) | Infos société (droite)
+                    ============================================== -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr>
+                            <td style="width: 30%; vertical-align: top; padding-right: 10px;">
+                                <img t-if="logo_coda" t-att-src="logo_coda"
+                                     style="max-height: 80px; max-width: 155px; display: block; margin-bottom: 6px;"/>
+                                <img t-if="logo_mase" t-att-src="logo_mase"
+                                     style="max-height: 50px; max-width: 100px; display: block;"/>
+                            </td>
+                            <td style="width: 70%; vertical-align: top; text-align: right; font-size: 12px; line-height: 1.6; font-family: Arial, sans-serif;">
+                                <strong style="font-size: 12px;">
+                                    <span t-esc="o.company_id.name"/>
+                                </strong><br/>
+                                <t t-if="o.company_id.street">
+                                    <span t-esc="o.company_id.street"/><br/>
+                                </t>
+                                <t t-if="o.company_id.zip or o.company_id.city">
+                                    <span t-esc="(o.company_id.zip or '') + ' ' + (o.company_id.city or '')"/><br/>
+                                </t>
+                                <t t-if="o.company_id.company_registry">
+                                    R.C. N<span style="vertical-align:super;font-size:0.75em;line-height:0;">o</span> <span t-esc="o.company_id.company_registry"/> - CC : <span t-esc="o.company_id.vat"/><br/>
+                                </t>
+                                <t t-if="o.company_id.phone">
+                                    TEL : <span t-esc="o.company_id.phone"/> / <span t-esc="o.company_id.mobile"/><br/>
+                                </t>
+                                <t t-if="o.company_id.email">
+                                    E-mail : <span t-esc="o.company_id.email"/><br/>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ==============================================
+                         TITRE + FOURNISSEUR (côte à côte)
+                    ============================================== -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+                        <tr>
+                            <!-- Gauche : Titre + table numéro/date -->
+                            <td style="width: 55%; vertical-align: top; padding-right: 12px;">
+                                <div style="font-size: 22px; font-weight: bold; font-family: Arial, sans-serif; letter-spacing: 1px; margin-bottom: 10px;">
+                                    BON DE COMMANDE FOURNISSEUR
+                                </div>
+                                <table style="border-collapse: collapse; width: auto;">
+                                    <tr style="background-color: #ebebeb;">
+                                        <th style="border: 1px solid #999999; padding: 5px 20px; text-align: center; font-size: 10px; font-family: Arial, sans-serif;">Numero</th>
+                                        <th style="border: 1px solid #999999; padding: 5px 20px; text-align: center; font-size: 10px; font-family: Arial, sans-serif;">Date</th>
+                                        <th style="border: 1px solid #999999; padding: 5px 20px; text-align: center; font-size: 10px; font-family: Arial, sans-serif;">Ref. Fournisseur</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #999999; padding: 5px 20px; text-align: center; color: #1a5fad; font-weight: bold; font-family: Arial, sans-serif;">
+                                            <span t-esc="o.name"/>
+                                        </td>
+                                        <td style="border: 1px solid #999999; padding: 5px 20px; text-align: center; font-family: Arial, sans-serif;">
+                                            <span t-esc="o.date_order.strftime('%d/%m/%Y') if o.date_order else ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #999999; padding: 5px 20px; text-align: center; font-family: Arial, sans-serif;">
+                                            <span t-esc="o.partner_ref or ''"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <!-- Droite : Nom fournisseur en grand -->
+                            <td style="width: 45%; vertical-align: middle; text-align: center;
+                                       border: 2px solid #999999; padding: 10px 16px;">
+                                <strong style="font-size: 22px; font-family: Arial, sans-serif; letter-spacing: 1px;">
+                                    <span t-esc="o.partner_id.name"/>
+                                </strong>
+                                <t t-if="o.partner_id.street">
+                                    <br/><span style="font-size: 10px; color: #555555;"
+                                          t-esc="(o.partner_id.street or '').upper()"/>
+                                </t>
+                                <t t-if="o.partner_id.vat">
+                                    <br/><span style="font-size: 10px; color: #555555;">
+                                        C.C : <span t-esc="o.partner_id.vat"/>
+                                    </span>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ==============================================
+                         TABLEAU DES LIGNES
+                    ============================================== -->
+                    <div style="margin-bottom: 68mm;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+                        <thead>
+                            <tr style="background-color: #ebebeb;">
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: left;   font-size: 10px; width: 14%; font-family: Arial, sans-serif;">Reference</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: left;   font-size: 10px;            font-family: Arial, sans-serif;">Designation</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: center; font-size: 10px; width: 8%;  font-family: Arial, sans-serif;">Qte</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: right;  font-size: 10px; width: 15%; font-family: Arial, sans-serif;">Px unitaire</th>
+                                <th style="border: 1px solid #999999; padding: 6px 8px; text-align: right;  font-size: 10px; width: 15%; font-family: Arial, sans-serif;">Montant HT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.order_line" t-as="line">
+
+                                <!-- Section -->
+                                <t t-if="line.display_type == 'line_section'">
+                                    <tr>
+                                        <td colspan="5" style="padding: 6px 8px; font-weight: bold; background-color: #f5f5f5; border-bottom: 1px solid #cccccc; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <!-- Note -->
+                                <t t-elif="line.display_type == 'line_note'">
+                                    <tr>
+                                        <td colspan="5" style="padding: 4px 8px; font-style: italic; color: #555555; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <!-- Ligne produit -->
+                                <t t-else="">
+                                    <tr>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.product_id.default_code or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="line.product_id.name or line.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: center; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="int(line.product_qty)"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: right; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="'{:,.0f}'.format(line.price_unit).replace(',', ' ')"/>
+                                        </td>
+                                        <td style="border: 1px solid #cccccc; padding: 5px 8px; text-align: right; vertical-align: top; font-family: Arial, sans-serif;">
+                                            <span t-esc="'{:,.0f}'.format(line.price_subtotal).replace(',', ' ')"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                            </t>
+                        </tbody>
+                    </table>
+                    </div>
+
+                    <!-- ==============================================
+                         PIED : Signature | Totaux
+                    ============================================== -->
+                    <div style="position: absolute; bottom: 0; left: 8mm; right: 8mm;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px;">
+                            <tr>
+                                <!-- Bloc signature -->
+                                <td style="width: 40%; vertical-align: top; padding-right: 10px;">
+                                    <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #999999;">
+                                        <tr>
+                                            <td style="padding: 5px 10px; background-color: #ebebeb; font-weight: bold; font-size: 10px;">
+                                                SIGNATURE
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="height: 60px; padding: 8px; text-align: center; vertical-align: middle;">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <!-- Totaux -->
+                                <td style="width: 60%; vertical-align: top;">
+                                    <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #999999;">
+                                        <tr>
+                                            <td style="padding: 5px 10px; background-color: #f5f5f5;">
+                                                <strong>TOTAL HT</strong>
+                                            </td>
+                                            <td style="padding: 5px 10px; text-align: right; white-space: nowrap;">
+                                                <span t-esc="'{:,.0f}'.format(o.amount_untaxed).replace(',', ' ')"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px 10px; background-color: #f5f5f5;">
+                                                <strong>T.V.A</strong>
+                                            </td>
+                                            <td style="padding: 5px 10px; text-align: right; white-space: nowrap;">
+                                                <span t-esc="'{:,.0f}'.format(o.amount_tax).replace(',', ' ')"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 6px 10px; background-color: #dddddd;">
+                                                <strong>NET A PAYER</strong>
+                                            </td>
+                                            <td style="padding: 6px 10px; text-align: right; background-color: #dddddd; white-space: nowrap;">
+                                                <strong>
+                                                    <span t-esc="'{:,.0f}'.format(o.amount_total).replace(',', ' ')"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

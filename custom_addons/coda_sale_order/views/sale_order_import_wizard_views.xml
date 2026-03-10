@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Mini-wizard : sauvegarder un modèle ── -->
+    <record id="view_import_config_save_wizard_form" model="ir.ui.view">
+        <field name="name">sale.order.import.config.save.wizard.form</field>
+        <field name="model">sale.order.import.config.save.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sauvegarder le modèle de configuration">
+                <group>
+                    <field name="name" string="Nom du modèle" placeholder="Ex : Import devis standard"/>
+                </group>
+                <!-- Champs cachés transmis via context -->
+                <field name="skip_rows" invisible="1"/>
+                <field name="read_coefficient" invisible="1"/>
+                <field name="col_coefficient" invisible="1"/>
+                <field name="read_numero_da" invisible="1"/>
+                <field name="ref_field" invisible="1"/>
+                <field name="create_missing_products" invisible="1"/>
+                <field name="col_ref" invisible="1"/>
+                <field name="col_name" invisible="1"/>
+                <field name="col_qty" invisible="1"/>
+                <field name="col_prix_revient" invisible="1"/>
+                <field name="col_price_unit" invisible="1"/>
+                <footer>
+                    <button name="action_save" type="object" string="Sauvegarder"
+                            class="btn-primary" data-hotkey="v"/>
+                    <button string="Annuler" special="cancel" class="btn-secondary"
+                            data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Wizard principal d'import ── -->
+    <record id="view_sale_order_import_wizard_form" model="ir.ui.view">
+        <field name="name">sale.order.import.wizard.form</field>
+        <field name="model">sale.order.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Importer des lignes depuis Excel">
+                <field name="order_id" invisible="1"/>
+
+                <group string="Modèle de configuration">
+                    <div class="d-flex align-items-center gap-2">
+                        <field name="config_id" string="Charger un modèle"
+                               options="{'no_create': True}"
+                               nolabel="1"
+                               style="flex:1"/>
+                        <button name="action_save_config" type="object"
+                                string="Sauvegarder comme modèle"
+                                class="btn btn-secondary btn-sm"
+                                icon="fa-save"/>
+                    </div>
+                </group>
+
+                <group string="Fichier Excel">
+                    <field name="file_data" widget="binary" filename="file_name"
+                           string="Fichier (.xlsx)"/>
+                    <field name="file_name" invisible="1"/>
+                    <field name="header_rows" string="Lignes d'en-tête à ignorer"/>
+                    <field name="ref_field" string="Identifier le produit par"/>
+                    <field name="create_missing_products" string="Créer les produits manquants"/>
+                </group>
+
+                <group string="Lecture automatique">
+                    <group>
+                        <field name="read_coefficient" string="Lire le coefficient (ligne 1)"/>
+                        <field name="col_coefficient" string="Colonne coefficient"
+                               invisible="not read_coefficient"/>
+                    </group>
+                    <group>
+                        <field name="read_numero_da" string="Lire le N° DA (dernière ligne)"/>
+                    </group>
+                </group>
+
+                <group string="Correspondance des colonnes">
+                    <group>
+                        <field name="col_ref" string="Colonne désignation/produit"/>
+                        <field name="col_name" string="Colonne nom produit"
+                               invisible="ref_field == 'name' or not create_missing_products"/>
+                        <field name="col_qty" string="Quantité"/>
+                    </group>
+                    <group>
+                        <field name="col_prix_revient" string="Prix de revient"/>
+                        <field name="col_price_unit" string="Prix de vente (vide = calcul auto)"/>
+                    </group>
+                </group>
+
+                <div class="alert alert-info" role="alert">
+                    <strong>Format attendu :</strong>
+                    <ul class="mb-0">
+                        <li>Ligne 1 : coefficient en colonne D (ex : <code>1,30</code>)</li>
+                        <li>Ligne 2 : en-têtes (Désignation, QTE, Prix Revient, Prix UNIT VTE)</li>
+                        <li>Lignes 3+ : données produits</li>
+                        <li>Dernière ligne (optionnelle) : N° DA (ex : <code>DA 736</code>)</li>
+                    </ul>
+                </div>
+
+                <footer>
+                    <button name="action_import" type="object" string="Importer"
+                            class="btn-primary" data-hotkey="v"/>
+                    <button string="Annuler" special="cancel" class="btn-secondary"
+                            data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_order_import_wizard" model="ir.actions.act_window">
+        <field name="name">Importer lignes depuis Excel</field>
+        <field name="res_model">sale.order.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_order_id': active_id}</field>
+    </record>
+
+</odoo>

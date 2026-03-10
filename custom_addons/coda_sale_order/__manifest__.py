@@ -1,0 +1,20 @@
+{
+    'name': 'Coda Sale Order - Prix de revient et marge',
+    'version': '17.0.1.1.0',
+    'category': 'Sales',
+    'summary': 'Ajoute prix de revient, marge, coefficient de sélectivité et import Excel sur les lignes de devis/commande',
+    'author': 'Coplastic',
+    'depends': ['sale'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/sequences.xml',
+        'reports/report_coda_devis.xml',
+        'reports/report_coda_bon_commande.xml',
+        'views/sale_order_import_wizard_views.xml',
+        'views/sale_order_views.xml',
+    ],
+    'installable': True,
+    'auto_install': False,
+    'application': False,
+    'license': 'LGPL-3',
+}
