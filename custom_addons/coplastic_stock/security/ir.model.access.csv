@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_print_history_user,stock.picking.print.history.user,model_stock_picking_print_history,base.group_user,1,0,1,0
 access_print_history_manager,stock.picking.print.history.manager,model_stock_picking_print_history,stock.group_stock_manager,1,1,1,1
 access_stock_alert_manager,coplastic.stock.alert.manager,model_coplastic_stock_alert,stock.group_stock_manager,1,1,1,1
+access_waste_purchase_wizard,report.waste.purchase.wizard,model_report_waste_purchase_wizard,base.group_user,1,1,1,0

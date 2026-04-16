@@ -27,4 +27,16 @@
         <field name="code">CI_NET</field>
     </record>
 
+    <!-- Déductions sur net (avances, prêts, etc.) -->
+    <record id="ci_categ_deductions" model="hr.salary.rule.category">
+        <field name="name">Déductions</field>
+        <field name="code">CI_DED</field>
+    </record>
+
+    <!-- Catégorie technique : règles de calcul interne (non affichées, non sommées) -->
+    <record id="ci_categ_tech" model="hr.salary.rule.category">
+        <field name="name">Technique</field>
+        <field name="code">CI_TECH</field>
+    </record>
+
 </odoo>

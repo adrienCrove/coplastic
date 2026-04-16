@@ -18,6 +18,10 @@
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.external_layout">
                     <div class="page" style="font-size: 10px;">
+                        <style>
+                            .payslip-lines td, .payslip-lines th { border-top: none !important; border-bottom: none !important; }
+                            .payslip-lines { border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6; }
+                        </style>
 
                         <!-- EN-TÊTE : Titre BULLETIN DE PAIE -->
                         <div class="row mb-3">
@@ -124,83 +128,142 @@
                         </div>
 
                         <!-- TABLEAU DES LIGNES DE PAIE -->
-                        <table class="table table-sm table-bordered" style="font-size: 9px;">
+                        <table class="table table-sm table-bordered payslip-lines" style="font-size: 9px;">
                             <thead style="background-color: #e8e8e8;">
                                 <tr>
                                     <th rowspan="2" style="width: 5%;">N°</th>
                                     <th rowspan="2" style="width: 25%;">Désignation</th>
-                                    <th rowspan="2" style="width: 7%;">Nombre</th>
-                                    <th rowspan="2" style="width: 12%;">Base</th>
-                                    <th rowspan="2" style="width: 6%;">Taux</th>
-                                    <th colspan="2" class="text-center" style="width: 22%;">Part salariale</th>
-                                    <th colspan="2" class="text-center" style="width: 22%;">Part patronale</th>
+                                    <th rowspan="2" style="width: 7%;" class="text-end">Nombre</th>
+                                    <th rowspan="2" style="width: 12%;" class="text-end">Base</th>
+                                    <th colspan="3" class="text-center" style="width: 24%;">Part salariale</th>
+                                    <th colspan="2" class="text-center" style="width: 27%;">Part patronale</th>
                                 </tr>
                                 <tr>
-                                    <th class="text-center">Gain</th>
-                                    <th class="text-center">Retenue</th>
-                                    <th class="text-center">Taux</th>
-                                    <th class="text-center">Retenue</th>
+                                    <th class="text-end">Taux</th>
+                                    <th class="text-end">Gain</th>
+                                    <th class="text-end">Retenue</th>
+                                    <th class="text-end">Taux</th>
+                                    <th class="text-end">Retenue</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="o.line_ids.sorted(key=lambda l: l.sequence)" t-as="line">
-                                    <t t-if="line.appears_on_payslip and line.total != 0">
-                                        <t t-set="is_brut" t-value="line.category_id.code == 'CI_BRUT'"/>
-                                        <t t-set="is_cotis_sal" t-value="line.category_id.code == 'CI_COT_SAL'"/>
-                                        <t t-set="is_cotis_pat" t-value="line.category_id.code == 'CI_COT_PAT'"/>
-                                        <t t-set="is_avt" t-value="line.category_id.code == 'CI_AVT'"/>
-                                        <t t-set="is_net" t-value="line.category_id.code == 'CI_NET'"/>
-                                        <t t-set="is_total" t-value="line.code in ('CI_BRUT_TOTAL', 'CI_TOT_COT_SAL', 'CI_TOT_COT_PAT', 'CI_NET')"/>
+                                <!-- Lookup par code → ligne pour les fusions salarial/patronal -->
+                                <t t-set="lbc" t-value="{l.code: l for l in o.line_ids}"/>
+                                <t t-set="jours_line" t-value="lbc.get('CI_JOURS')"/>
+                                <t t-set="jours_val" t-value="jours_line.total if jours_line else 30"/>
+
+                                <!-- Numéros de référence CI (format bulletin ivoirien) -->
+                                <t t-set="refs" t-value="{'CI_BASE': '1010', 'CI_SURS': '1060', 'CI_ANC': '1320', 'CI_CONG': '1070', 'CI_RET_SAL': '5200', 'CI_IPS_SAL': '5150', 'CI_RED_IMP': '5050', 'CI_ITS_NET': '5000', 'CI_CMU_SAL': '5650', 'CI_IS_PAT': '5100', 'CI_ITS_PAT': '5400', 'CI_TA': '5500', 'CI_FPC': '5550', 'CI_FPC_REG': '5600', 'CI_PF': '5250', 'CI_AT': '5300', 'CI_TRANSP': '8020'}"/>
+
+                                <!-- Codes affichés en fusion (portés par leur ligne salariale partenaire) -->
+                                <t t-set="merged_codes" t-value="['CI_RET_PAT', 'CI_CMU_PAT', 'CI_TOT_COT_PAT']"/>
+
+                                <!-- Ordre d'affichage indépendant de la séquence de calcul -->
+                                <t t-set="display_order" t-value="['CI_BASE','CI_SURS','CI_ANC','CI_CONG','CI_HS_15','CI_HS_50','CI_HS_75N','CI_HS_75J','CI_HS_100','CI_TRANSP_IMP','CI_BRUT_TOTAL','CI_IS_PAT','CI_ITS','CI_RED_IMP','CI_ITS_NET','CI_IPS_SAL','CI_RET_SAL','CI_CMU_SAL','CI_TOT_COT_SAL','CI_RET_PAT','CI_ITS_PAT','CI_TA','CI_FPC','CI_PF','CI_AT','CI_CMU_PAT','CI_TOT_COT_PAT','CI_TRANSP','CI_AVANCE','CI_NET']"/>
+                                <t t-set="order_map" t-value="{code: idx for idx, code in enumerate(display_order)}"/>
+                                <t t-foreach="o.line_ids.sorted(key=lambda l: order_map.get(l.code, 999))" t-as="line">
+                                    <t t-if="line.appears_on_payslip and line.total != 0 and line.code not in merged_codes">
+
+                                        <t t-set="cat" t-value="line.category_id.code"/>
+                                        <t t-set="is_brut"      t-value="cat == 'CI_BRUT'"/>
+                                        <t t-set="is_cotis_sal" t-value="cat == 'CI_COT_SAL'"/>
+                                        <t t-set="is_cotis_pat" t-value="cat == 'CI_COT_PAT'"/>
+                                        <t t-set="is_avt"       t-value="cat == 'CI_AVT'"/>
+                                        <t t-set="is_net"       t-value="cat == 'CI_NET'"/>
+                                        <t t-set="is_total"     t-value="line.code in ('CI_BRUT_TOTAL', 'CI_TOT_COT_SAL', 'CI_NET')"/>
+
+                                        <!-- Ligne patronale jumelée selon le code -->
+                                        <t t-set="pat_line" t-value="False"/>
+                                        <t t-if="line.code == 'CI_RET_SAL'">
+                                            <t t-set="pat_line" t-value="lbc.get('CI_RET_PAT', False)"/>
+                                        </t>
+                                        <t t-if="line.code == 'CI_CMU_SAL'">
+                                            <t t-set="pat_line" t-value="lbc.get('CI_CMU_PAT', False)"/>
+                                        </t>
+                                        <t t-if="line.code == 'CI_TOT_COT_SAL'">
+                                            <t t-set="pat_line" t-value="lbc.get('CI_TOT_COT_PAT', False)"/>
+                                        </t>
 
                                         <tr t-att-style="'font-weight: bold; background-color: #f5f5f5;' if is_total else ''">
-                                            <!-- N° (code) -->
-                                            <td><t t-if="not is_total"><t t-esc="line.code"/></t></td>
-                                            <!-- Désignation -->
-                                            <td><t t-esc="line.name"/></td>
-                                            <!-- Nombre (quantity si != 1) -->
-                                            <td class="text-end">
-                                                <t t-if="line.quantity != 1.0 and not is_total">
-                                                    <t t-esc="'%.2f' % line.quantity"/>
+
+                                            <!-- N° -->
+                                            <td>
+                                                <t t-if="not is_total">
+                                                    <t t-esc="refs.get(line.code, '')"/>
                                                 </t>
                                             </td>
-                                            <!-- Base -->
+
+                                            <!-- Désignation -->
+                                            <td>
+                                                <t t-if="line.code == 'CI_TOT_COT_SAL'">Total Cotisations</t>
+                                                <t t-else=""><t t-esc="line.name"/></t>
+                                            </td>
+
+                                            <!-- Nombre -->
                                             <td class="text-end">
-                                                <t t-if="not is_total and not is_net">
-                                                    <t t-if="line.amount != 0">
-                                                        <t t-esc="'{:,.0f}'.format(abs(line.amount)).replace(',', ' ')"/>
+                                                <t t-if="not is_total">
+                                                    <t t-if="line.code in ('CI_BASE', 'CI_SURS', 'CI_TRANSP')">
+                                                        <t t-esc="'%.2f' % jours_val"/>
+                                                    </t>
+                                                    <t t-elif="line.code == 'CI_CMU_SAL'">1,00</t>
+                                                    <t t-elif="line.quantity != 1.0">
+                                                        <t t-esc="'%.2f' % line.quantity"/>
                                                     </t>
                                                 </t>
                                             </td>
+
+                                            <!-- Base -->
+                                            <td class="text-end">
+                                                <t t-if="not is_total and not is_net and line.amount != 0">
+                                                    <t t-esc="'{:,.0f}'.format(abs(line.amount)).replace(',', ' ')"/>
+                                                </t>
+                                            </td>
+
                                             <!-- Taux salarié -->
                                             <td class="text-end">
-                                                <t t-if="line.rate != 100 and not is_total">
+                                                <t t-if="not is_total and line.rate != 100">
                                                     <t t-esc="'%.2f' % line.rate"/>
                                                 </t>
                                             </td>
+
                                             <!-- Gain salarié -->
                                             <td class="text-end">
-                                                <t t-if="(is_brut or is_avt or is_net) and line.total &gt; 0">
+                                                <t t-if="(is_brut or is_avt or is_net or line.code == 'CI_RED_IMP') and line.total &gt; 0">
                                                     <t t-esc="'{:,.0f}'.format(line.total).replace(',', ' ')"/>
                                                 </t>
                                             </td>
+
                                             <!-- Retenue salarié -->
                                             <td class="text-end">
-                                                <t t-if="is_cotis_sal or (line.total &lt; 0 and not is_cotis_pat)">
+                                                <t t-if="is_cotis_sal and line.total != 0 and line.code != 'CI_RED_IMP'">
                                                     <t t-esc="'{:,.0f}'.format(abs(line.total)).replace(',', ' ')"/>
                                                 </t>
                                             </td>
+
                                             <!-- Taux patronal -->
                                             <td class="text-end">
+                                                <!-- Ligne patronale pure (CI_ITS_PAT, CI_TA, etc.) -->
                                                 <t t-if="is_cotis_pat and not is_total and line.rate != 100">
                                                     <t t-esc="'%.2f' % line.rate"/>
                                                 </t>
-                                            </td>
-                                            <!-- Retenue patronal -->
-                                            <td class="text-end">
-                                                <t t-if="is_cotis_pat">
-                                                    <t t-esc="'{:,.0f}'.format(abs(line.total)).replace(',', ' ')"/>
+                                                <!-- Ligne jumelée (CI_RET_PAT, CI_CMU_PAT) -->
+                                                <t t-if="not is_cotis_pat and pat_line and pat_line.rate != 100">
+                                                    <t t-esc="'%.2f' % pat_line.rate"/>
                                                 </t>
                                             </td>
+
+                                            <!-- Retenue patronale -->
+                                            <td class="text-end">
+                                                <!-- Ligne patronale pure -->
+                                                <t t-if="is_cotis_pat and line.total != 0">
+                                                    <t t-esc="'{:,.0f}'.format(abs(line.total)).replace(',', ' ')"/>
+                                                </t>
+                                                <!-- Ligne jumelée -->
+                                                <t t-if="not is_cotis_pat and pat_line and pat_line.total != 0">
+                                                    <t t-esc="'{:,.0f}'.format(abs(pat_line.total)).replace(',', ' ')"/>
+                                                </t>
+                                            </td>
+
                                         </tr>
                                     </t>
                                 </t>

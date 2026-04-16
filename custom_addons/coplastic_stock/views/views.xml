@@ -27,6 +27,22 @@
                 <field name="last_print_date"/>
             </xpath>
 
+            <!-- Total quantité en bas des lignes de produit (onglet Opérations) -->
+            <xpath expr="//field[@name='move_ids_without_package']" position="after">
+                <div class="row justify-content-end" style="margin-top: 8px;">
+                    <div class="col-auto">
+                        <table class="table table-sm table-borderless" style="width: auto;">
+                            <tr style="font-size: 14px; font-weight: bold;">
+                                <td class="text-end pe-3">Quantité totale :</td>
+                                <td class="text-end" style="min-width: 80px; padding-right: 10px;">
+                                    <field name="total_product_qty" nolabel="1"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </xpath>
+
             <!-- Remplacer le bouton Imprimer (état done) pour capturer la date -->
             <xpath expr="//button[@name='%(stock.action_report_delivery)d']" position="attributes">
                 <attribute name="name">action_print_delivery_slip</attribute>

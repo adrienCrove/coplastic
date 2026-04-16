@@ -58,3 +58,10 @@ class HrEmployee(models.Model):
         default="Convention Collective Interprofessionnelle",
         groups="hr.group_hr_user",
     )
+    l10n_ci_is_expatrie = fields.Boolean(
+        string="Expatrié",
+        default=False,
+        help="Cocher si l'employé est un travailleur expatrié. "
+             "Active l'ITS Exploitation Patronal (10.40%) sur son bulletin.",
+        groups="hr.group_hr_user",
+    )

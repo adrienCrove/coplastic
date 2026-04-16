@@ -265,6 +265,20 @@ class StockPickingPrintHistory(models.Model):
 class CoplasticStockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    total_product_qty = fields.Float(
+        string="Quantité totale",
+        compute='_compute_total_product_qty',
+        store=False,
+    )
+
+    @api.depends('move_ids.quantity', 'move_ids.product_uom_qty')
+    def _compute_total_product_qty(self):
+        for picking in self:
+            if picking.state == 'done':
+                picking.total_product_qty = sum(picking.move_ids.mapped('quantity'))
+            else:
+                picking.total_product_qty = sum(picking.move_ids.mapped('product_uom_qty'))
+
     last_print_date = fields.Datetime(
         string="Dernière impression",
         readonly=True,

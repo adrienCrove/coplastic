@@ -19,6 +19,7 @@
                         <group string="Classification">
                             <field name="l10n_ci_categorie"/>
                             <field name="l10n_ci_qualification"/>
+                            <field name="l10n_ci_is_expatrie"/>
                         </group>
                     </group>
                     <group>

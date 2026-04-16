@@ -16,11 +16,14 @@
     'version': '17.0.2.0.0',
     'license': 'LGPL-3',
 
-    'depends': ['stock'],
+    'depends': ['stock', 'purchase'],
 
     'data': [
         'security/ir.model.access.csv',
         'data/cron.xml',
+        'report/report_delivery_total.xml',
+        'report/report_waste_purchase.xml',
+        'wizard/report_waste_purchase_wizard_views.xml',
         'views/views.xml',
         'views/res_config_settings_views.xml',
     ],

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="payroll_book_wizard_form" model="ir.ui.view">
+        <field name="name">l10n.ci.payroll.book.wizard.form</field>
+        <field name="model">l10n.ci.payroll.book.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Grand Livre de Paie">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="department_id"/>
+                        <field name="output_format" widget="radio"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_print" string="Imprimer" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_payroll_book_wizard" model="ir.actions.act_window">
+        <field name="name">Grand Livre de Paie</field>
+        <field name="res_model">l10n.ci.payroll.book.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_payroll_report"
+              name="Rapports"
+              parent="payroll.payroll_menu_root"
+              sequence="30"/>
+
+    <menuitem id="menu_payroll_book"
+              name="Grand Livre de Paie"
+              parent="menu_payroll_report"
+              action="action_payroll_book_wizard"
+              sequence="10"/>
+
+</odoo>

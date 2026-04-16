@@ -1,1 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_payroll_book_wizard,l10n.ci.payroll.book.wizard,model_l10n_ci_payroll_book_wizard,payroll.group_payroll_user,1,1,1,1

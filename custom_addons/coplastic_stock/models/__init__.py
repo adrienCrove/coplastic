@@ -2,3 +2,4 @@
 
 from . import models
 from . import res_config_settings
+from . import report_waste_purchase

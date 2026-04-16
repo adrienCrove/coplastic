@@ -145,7 +145,7 @@ class SaleOrderImportWizard(models.TransientModel):
         return None
 
     def _create_product(self, ref, row, prix_revient, price_unit):
-        product_vals = {'type': 'consu'}
+        product_vals = {'type': 'product'}
         if self.ref_field == 'name':
             product_vals['name'] = ref
         else:

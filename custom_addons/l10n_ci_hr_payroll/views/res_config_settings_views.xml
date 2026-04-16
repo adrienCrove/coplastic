@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_l10n_ci" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.l10n.ci.payroll</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="payroll.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="require_code_and_category" position="after">
+                <block id="l10n_ci_settings"
+                       title="Localisation Côte d'Ivoire">
+                    <setting
+                        string="SMIG mensuel (FCFA)"
+                        help="Salaire Minimum Interprofessionnel Garanti — base de calcul des cotisations CNPS employé.">
+                        <field name="l10n_ci_smig"/>
+                    </setting>
+                    <setting
+                        string="Bloquer les bulletins hors période de contrat"
+                        help="Empêche de calculer ou confirmer un bulletin dont la période est antérieure à la date de début du contrat.">
+                        <field name="l10n_ci_check_contract_dates"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Ajouter le total quantité en bas du bon de livraison PDF -->
+    <template id="report_delivery_total" inherit_id="stock.report_delivery_document">
+        <!-- Insérer après le 2e tableau (état done) — ne pas insérer entre t-if/t-elif -->
+        <xpath expr="//table[@name='stock_move_line_table']" position="after">
+            <div class="row justify-content-end mt-2" t-if="o.state == 'done'">
+                <div class="col-auto">
+                    <table class="table table-sm table-borderless" style="width: auto;">
+                        <tr style="font-size: 13px; font-weight: bold; border-top: 2px solid #000;">
+                            <td class="text-end pe-4">Quantité totale :</td>
+                            <td class="text-end" style="min-width: 80px;">
+                                <t t-esc="'%.2f' % sum(o.move_ids.mapped('quantity'))"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <!-- Même total pour état brouillon/assigné -->
+            <div class="row justify-content-end mt-2" t-if="o.state != 'done'">
+                <div class="col-auto">
+                    <table class="table table-sm table-borderless" style="width: auto;">
+                        <tr style="font-size: 13px; font-weight: bold; border-top: 2px solid #000;">
+                            <td class="text-end pe-4">Quantité totale :</td>
+                            <td class="text-end" style="min-width: 80px;">
+                                <t t-esc="'%.2f' % sum(o.move_ids.mapped('product_uom_qty'))"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

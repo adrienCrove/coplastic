@@ -21,7 +21,9 @@
     'version': '17.0.1.0.0',
     'depends': [
         'payroll',
+        'payroll_account',
         'hr_contract',
+        'report_xlsx',
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -31,7 +33,11 @@
         'data/hr_payroll_structure.xml',
         'views/hr_employee_views.xml',
         'views/hr_contract_views.xml',
+        'views/hr_payslip_views.xml',
+        'views/res_config_settings_views.xml',
         'report/report_payslip_ci.xml',
+        'report/report_payroll_book.xml',
+        'wizard/payroll_book_wizard.xml',
     ],
     'license': 'LGPL-3',
     'installable': True,

@@ -7,7 +7,7 @@ class AccountJournal(models.Model):
 
     auto_reconcile = fields.Boolean(
         string="Rapprochement automatique",
-        default=False,
+        default=True,
         help="Si activé, lors de la validation d'un paiement, une écriture de rapprochement "
              "sera automatiquement créée pour solder le compte de paiements en suspens "
              "et mouvementer le compte réel de la banque ou de la caisse.",

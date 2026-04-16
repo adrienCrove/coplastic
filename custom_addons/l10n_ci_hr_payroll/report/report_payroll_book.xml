@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Format papier paysage -->
+    <record id="paperformat_payroll_book" model="report.paperformat">
+        <field name="name">Grand Livre Paie - Paysage A4</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+    </record>
+
+    <!-- Template QWeb PDF -->
+    <template id="report_payroll_book">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page" style="font-size: 8px;">
+                    <style>
+                        @page { size: A4 landscape; }
+
+                        .plb-header { margin-bottom: 10px; }
+                        .plb-header h2 { font-weight: bold; font-size: 16px; margin: 0; }
+                        .plb-header .subtitle { font-size: 10px; color: #666; }
+
+                        .plb-info { font-size: 9px; margin-bottom: 8px; }
+                        .plb-info td { padding: 2px 8px; }
+                        .plb-info strong { color: #003366; }
+
+                        .plb { width: 100%; border-collapse: collapse; font-size: 7px; }
+                        .plb th {
+                            background-color: #003366; color: white;
+                            padding: 4px 2px; text-align: center;
+                            font-size: 6px; font-weight: bold;
+                            border: 1px solid #003366;
+                        }
+                        .plb td {
+                            padding: 3px 2px; text-align: right;
+                            border-left: 1px solid #dee2e6;
+                            border-right: 1px solid #dee2e6;
+                        }
+                        .plb td.text-left { text-align: left; }
+                        .plb td.text-center { text-align: center; }
+                        .plb tbody tr { border-bottom: none; }
+                        .plb tbody tr:nth-child(even) { background-color: #f8f9fa; }
+                        .plb tbody tr:hover { background-color: #e9ecef; }
+
+                        .plb .section-header {
+                            background-color: #e8e8e8; font-weight: bold;
+                            text-align: center; font-size: 6px;
+                            border: 1px solid #003366; color: #003366;
+                        }
+
+                        .plb .totals td {
+                            font-weight: bold; background-color: #003366;
+                            color: white; border: 1px solid #003366;
+                            padding: 4px 2px;
+                        }
+
+                        .plb-footer { margin-top: 10px; font-size: 8px; }
+                        .plb-footer td { padding: 3px 10px; }
+
+                        .net-box {
+                            background-color: #003366; color: white;
+                            font-size: 11px; font-weight: bold;
+                            padding: 6px 15px; display: inline-block;
+                            margin-top: 8px;
+                        }
+                    </style>
+
+                    <!-- EN-TÊTE -->
+                    <div class="row plb-header">
+                        <div class="col-7">
+                            <!-- Infos société via external_layout -->
+                        </div>
+                        <div class="col-5 text-end">
+                            <h2>GRAND LIVRE DE PAIE</h2>
+                            <table class="table table-sm table-borderless plb-info" style="font-size: 9px;">
+                                <tr>
+                                    <td>Période du</td>
+                                    <td class="text-end"><strong><t t-esc="data['date_from']"/></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>au</td>
+                                    <td class="text-end"><strong><t t-esc="data['date_to']"/></strong></td>
+                                </tr>
+                                <t t-if="data['department_name'] != 'Tous'">
+                                    <tr>
+                                        <td>Département</td>
+                                        <td class="text-end"><strong><t t-esc="data['department_name']"/></strong></td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TABLEAU PRINCIPAL -->
+                    <table class="plb">
+                        <thead>
+                            <!-- Ligne de groupement -->
+                            <tr>
+                                <th rowspan="2" style="width: 3%;">N°</th>
+                                <th rowspan="2" style="width: 5%;">Matricule</th>
+                                <th rowspan="2" style="width: 10%;">Nom et Prénoms</th>
+                                <th rowspan="2" style="width: 6%;">Emploi</th>
+                                <th colspan="3" style="border-bottom: 2px solid white;">Éléments du salaire</th>
+                                <th colspan="4" style="border-bottom: 2px solid white;">Retenues salariales</th>
+                                <th rowspan="2" style="width: 4%;">Transport</th>
+                                <th rowspan="2" style="width: 5%; background-color: #1a5276;">Net à Payer</th>
+                                <th colspan="8" style="border-bottom: 2px solid white;">Charges patronales</th>
+                            </tr>
+                            <tr>
+                                <!-- Éléments du salaire -->
+                                <th>Sal. Base</th>
+                                <th>Sursalaire</th>
+                                <th style="background-color: #1a5276;">Total Brut</th>
+                                <!-- Retenues salariales -->
+                                <th>CNPS</th>
+                                <th>ITS Net</th>
+                                <th>CMU</th>
+                                <th style="background-color: #1a5276;">Tot. Ret.</th>
+                                <!-- Charges patronales -->
+                                <th>CNPS</th>
+                                <th>IS</th>
+                                <th>ITS</th>
+                                <th>TA</th>
+                                <th>FPC</th>
+                                <th>PF</th>
+                                <th>AT</th>
+                                <th>CMU</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="data['rows']" t-as="row">
+                                <tr>
+                                    <td class="text-center"><t t-esc="row['num']"/></td>
+                                    <td class="text-left"><t t-esc="row['matricule']"/></td>
+                                    <td class="text-left"><t t-esc="row['name']"/></td>
+                                    <td class="text-left"><t t-esc="row['emploi']"/></td>
+                                    <t t-foreach="data['codes']" t-as="code">
+                                        <td>
+                                            <t t-if="row[code] != 0">
+                                                <t t-esc="'{:,.0f}'.format(abs(row[code])).replace(',', ' ')"/>
+                                            </t>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </t>
+
+                            <!-- LIGNE TOTAUX -->
+                            <tr class="totals">
+                                <td colspan="4" class="text-center">TOTAUX</td>
+                                <t t-foreach="data['codes']" t-as="code">
+                                    <td>
+                                        <t t-if="data['totals'][code] != 0">
+                                            <t t-esc="'{:,.0f}'.format(abs(data['totals'][code])).replace(',', ' ')"/>
+                                        </t>
+                                    </td>
+                                </t>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- PIED DE PAGE -->
+                    <div class="row plb-footer mt-3">
+                        <div class="col-6">
+                            <table class="table table-sm table-borderless" style="font-size: 9px; width: auto;">
+                                <tr>
+                                    <td><strong>Nombre d'employés :</strong></td>
+                                    <td><t t-esc="len(data['rows'])"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-6 text-end">
+                            <t t-set="net_total" t-value="data['totals'].get('CI_NET', 0)"/>
+                            <t t-if="net_total">
+                                <div class="net-box">
+                                    TOTAL NET À PAYER :
+                                    <t t-esc="'{:,.0f}'.format(abs(net_total)).replace(',', ' ')"/> FCFA
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Action PDF -->
+    <record id="action_report_payroll_book_pdf" model="ir.actions.report">
+        <field name="name">Grand Livre de Paie (PDF)</field>
+        <field name="model">l10n.ci.payroll.book.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ci_hr_payroll.report_payroll_book</field>
+        <field name="report_file">l10n_ci_hr_payroll.report_payroll_book</field>
+        <field name="paperformat_id" ref="l10n_ci_hr_payroll.paperformat_payroll_book"/>
+    </record>
+
+    <!-- Action XLSX -->
+    <record id="action_report_payroll_book_xlsx" model="ir.actions.report">
+        <field name="name">Grand Livre de Paie (Excel)</field>
+        <field name="model">l10n.ci.payroll.book.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">l10n_ci_hr_payroll.report_payroll_book_xlsx</field>
+        <field name="report_file">l10n_ci_hr_payroll.report_payroll_book_xlsx</field>
+    </record>
+
+</odoo>

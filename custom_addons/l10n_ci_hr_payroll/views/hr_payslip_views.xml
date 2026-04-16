@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Renommer "Taux (%)" en "Prorata (%)" dans la liste des lignes de bulletin -->
+    <record id="hr_payslip_line_view_tree_ci" model="ir.ui.view">
+        <field name="name">hr.payslip.line.tree.ci</field>
+        <field name="model">hr.payslip.line</field>
+        <field name="inherit_id" ref="payroll.hr_payslip_line_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="rate" position="attributes">
+                <attribute name="string">Taux (%)</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- Renommer "Taux (%)" dans l'onglet "Calcul de salaire" -->
+    <record id="hr_payslip_view_form_ci" model="ir.ui.view">
+        <field name="name">hr.payslip.view.form.ci</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="payroll.hr_payslip_view_form"/>
+        <field name="arch" type="xml">
+            <field name="rate" readonly="1" position="attributes">
+                <attribute name="string">Taux (%)</attribute>
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -34,3 +34,18 @@ class HrContract(models.Model):
         default=173.33,
         help="Nombre d'heures mensuelles (173.33h = 40h/semaine)",
     )
+    l10n_ci_montant_ips = fields.Monetary(
+        string="Cotisation IPS mensuelle (salarié)",
+        default=0.0,
+        help="Montant fixe mensuel de cotisation IPS salariale. 0 = non appliqué.",
+        tracking=True,
+    )
+    l10n_ci_reduction_impot = fields.Monetary(
+        string="Réduction d'impôt mensuelle",
+        default=0.0,
+        help="Montant mensuel de réduction d'impôt (à déterminer). 0 = non appliqué.",
+        tracking=True,
+    )
+    journal_id = fields.Many2one(
+        domain=[('type', '=', 'general')],
+    )

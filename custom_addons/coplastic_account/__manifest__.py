@@ -5,7 +5,7 @@
     'summary': 'Personnalisations comptabilité et facturation pour Coplastic',
     'category': 'Accounting',
     'author': 'Coplastic',
-    'depends': ['account', 'purchase', 'base_automation'],
+    'depends': ['account', 'purchase', 'base_automation', 'base_accounting_kit'],
     'data': [
         'data/mail_reminders.xml',
         'data/invoice_alert_cron.xml',

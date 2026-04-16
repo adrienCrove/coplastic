@@ -14,6 +14,8 @@
                 <field name="l10n_ci_indemnite_conge" widget="monetary"/>
                 <field name="l10n_ci_taux_anciennete"/>
                 <field name="l10n_ci_horaire_mensuel"/>
+                <field name="l10n_ci_montant_ips" widget="monetary"/>
+                <field name="l10n_ci_reduction_impot" widget="monetary"/>
             </xpath>
 
         </field>

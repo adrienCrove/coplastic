@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_salary_advance_user,hr.salary.advance.user,model_hr_salary_advance,payroll.group_payroll_user,1,1,1,0
+access_hr_salary_advance_manager,hr.salary.advance.manager,model_hr_salary_advance,payroll.group_payroll_manager,1,1,1,1
+access_hr_salary_advance_line_user,hr.salary.advance.line.user,model_hr_salary_advance_line,payroll.group_payroll_user,1,1,1,0
+access_hr_salary_advance_line_manager,hr.salary.advance.line.manager,model_hr_salary_advance_line,payroll.group_payroll_manager,1,1,1,1
