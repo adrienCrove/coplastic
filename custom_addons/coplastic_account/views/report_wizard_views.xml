@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Rendre les dates non obligatoires dans tous les wizards de rapports comptables -->
+    <record id="account_common_report_view_dates_optional" model="ir.ui.view">
+        <field name="name">account.report.dates.optional</field>
+        <field name="model">account.report</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_common_report_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_from']" position="attributes">
+                <attribute name="required">0</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_to']" position="attributes">
+                <attribute name="required">0</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

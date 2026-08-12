@@ -11,6 +11,53 @@
     </record>
 
     <!-- ============================================================
+         CANAL ALERTES DEVIS / COMMANDES
+    ============================================================ -->
+
+    <record id="channel_alertes_devis" model="discuss.channel" forcecreate="True">
+        <field name="name">Alertes Devis</field>
+        <field name="channel_type">channel</field>
+    </record>
+
+    <!-- ============================================================
+         TEMPLATE EMAIL — COMMANDE BIENTÔT ÉCHUE
+    ============================================================ -->
+
+    <record id="email_template_sale_order_due_soon" model="mail.template">
+        <field name="name">Alerte - Commande client bientôt échue</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="subject">&#9888; Échéance commande : ${object.name} - ${object.partner_id.name}</field>
+        <field name="email_to">${object.user_id.email or ''}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour <strong>${object.user_id.name or 'Utilisateur'}</strong>,</p>
+<p>La commande client suivante approche de son échéance de paiement et n'est pas encore entièrement facturée :</p>
+<table style="border-collapse:collapse;width:100%;max-width:600px">
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Commande</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.name}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Client</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.partner_id.name}</td>
+    </tr>
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Date commande</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${format_date(object.date_order)}</td>
+    </tr>
+    <tr>
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Conditions de paiement</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd">${object.payment_term_id.name or 'Non défini'}</td>
+    </tr>
+    <tr style="background:#f5f5f5">
+        <td style="padding:8px 12px;border:1px solid #ddd"><strong>Montant total</strong></td>
+        <td style="padding:8px 12px;border:1px solid #ddd;color:#c0392b"><strong>${format_amount(object.amount_total, object.currency_id)}</strong></td>
+    </tr>
+</table>
+<p style="margin-top:16px">Merci de procéder à la facturation dès que possible.</p>
+        ]]></field>
+    </record>
+
+    <!-- ============================================================
          FACTURES CLIENTS BIENTÔT ÉCHUES (cron)
     ============================================================ -->
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_ledger_supplier_filter" model="ir.ui.view">
+        <field name="name">account.report.partner.ledger.supplier.filter</field>
+        <field name="model">account.report.partner.ledger</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_report_partner_ledger_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='result_selection']" position="after">
+                <field
+                    name="supplier_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': True}"
+                    invisible="result_selection != 'supplier'"
+                />
+                <field
+                    name="customer_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': True}"
+                    invisible="result_selection != 'customer'"
+                />
+                <field
+                    name="account_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': True}"
+                    placeholder="Tous les comptes (411xxx, 401xxx…)"
+                />
+            </xpath>
+            <field name="reconciled" position="attributes">
+                <attribute name="string">Inclure les écritures lettrées (factures soldées)</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

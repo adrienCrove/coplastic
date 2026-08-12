@@ -11,4 +11,16 @@
         <field name="active">True</field>
         <field name="nextcall">2026-03-10 07:00:00</field>
     </record>
+
+    <record id="ir_cron_sale_order_due_soon_alert" model="ir.cron">
+        <field name="name">Coplastic - Alerte commandes clients bientôt échues</field>
+        <field name="model_id" ref="coplastic_account.model_coplastic_account_invoice_alert"/>
+        <field name="state">code</field>
+        <field name="code">model._run_sale_order_due_alerts()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="nextcall">2026-03-10 08:00:00</field>
+    </record>
 </odoo>

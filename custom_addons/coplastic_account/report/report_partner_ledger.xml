@@ -1,0 +1,125 @@
+<odoo>
+    <template id="report_partnerledger" inherit_id="base_accounting_kit.report_partnerledger">
+        <xpath expr="//t[@t-call='web.internal_layout']" position="replace">
+            <t t-call="web.internal_layout">
+                <t t-set="data_report_margin_top" t-value="20"/>
+                <t t-set="data_report_header_spacing" t-value="2"/>
+                <div class="page" style="margin-top: 0; padding-top: 0;">
+                    <!-- En-tête -->
+                    <div class="row mb-2">
+                        <div class="col-12 text-center">
+                            <h3 style="color: #1B7B3D; margin-bottom: 4px;">Grand livre des partenaires</h3>
+                            <p style="font-size: 11px; color: #555; margin:0;">
+                                <t t-if="data['form']['date_from']">
+                                    Du : <strong t-esc="data['form']['date_from']"/>
+                                </t>
+                                <t t-if="data['form']['date_to']">
+                                     Au : <strong t-esc="data['form']['date_to']"/>
+                                </t>
+                                  |  
+                                Écritures :
+                                <t t-if="data['form']['target_move'] == 'posted'">Validées</t>
+                                <t t-if="data['form']['target_move'] == 'all'">Toutes</t>
+                            </p>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm" style="font-size: 9px;">
+                        <thead>
+                            <tr style="background-color: #1B7B3D; color: white;">
+                                <th style="width:8%">Date</th>
+                                <th style="width:6%">JRN</th>
+                                <th style="width:8%">Compte</th>
+                                <th>Libellé</th>
+                                <th class="text-end" style="width:13%">Débit</th>
+                                <th class="text-end" style="width:13%">Crédit</th>
+                                <th class="text-end" style="width:13%">Facture avoir</th>
+                                <th class="text-end" style="width:13%">Solde</th>
+                                <th class="text-end" style="width:10%" t-if="data['form']['amount_currency']">Devise</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs_by_class" t-as="class_group">
+                                <!-- En-tête de classe -->
+                                <tr style="background-color: #1B7B3D; color: white;">
+                                    <td colspan="8" style="font-weight: bold; font-size: 10px; padding: 4px 6px;">
+                                        *** <t t-esc="class_group[0]"/> ***
+                                    </td>
+                                </tr>
+
+                                <t t-foreach="class_group[1]" t-as="acc_group">
+                                    <!-- En-tête de compte -->
+                                    <tr style="background-color: #e8f5e9;">
+                                        <td colspan="4" style="font-weight: bold; padding: 3px 6px;">
+                                            <t t-esc="acc_group[1]"/> - <t t-esc="acc_group[2]"/>
+                                        </td>
+                                        <td class="text-end" style="font-weight: bold; padding: 3px 6px; white-space: nowrap;">
+                                            <t t-esc="fmt(sum([sum_partner_account(data, p, acc_group[0], 'debit') for p in acc_group[3]]))"/>
+                                        </td>
+                                        <td class="text-end" style="font-weight: bold; padding: 3px 6px; white-space: nowrap;">
+                                            <t t-esc="fmt(sum([sum_partner_account(data, p, acc_group[0], 'credit') - sum_partner_account(data, p, acc_group[0], 'facture_avoir') for p in acc_group[3]]))"/>
+                                        </td>
+                                        <td class="text-end" style="font-weight: bold; padding: 3px 6px; white-space: nowrap;">
+                                            <t t-esc="fmt(sum([sum_partner_account(data, p, acc_group[0], 'facture_avoir') for p in acc_group[3]]))"/>
+                                        </td>
+                                        <td class="text-end" style="font-weight: bold; padding: 3px 6px; white-space: nowrap;">
+                                            <t t-esc="fmt(sum([sum_partner_account(data, p, acc_group[0], 'debit - credit') for p in acc_group[3]]))"/>
+                                        </td>
+                                    </tr>
+
+                                    <t t-foreach="acc_group[3]" t-as="partner">
+                                        <!-- Ligne récapitulative partenaire -->
+                                        <tr style="background-color: #f9f9f9;">
+                                            <td colspan="4" style="padding-left: 16px; font-style: italic;">
+                                                <t t-if="partner.ref"><t t-esc="partner.ref"/> - </t>
+                                                <t t-esc="partner.name"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <t t-esc="fmt(sum_partner_account(data, partner, acc_group[0], 'debit'))"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <t t-esc="fmt(sum_partner_account(data, partner, acc_group[0], 'credit') - sum_partner_account(data, partner, acc_group[0], 'facture_avoir'))"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <t t-esc="fmt(sum_partner_account(data, partner, acc_group[0], 'facture_avoir'))"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <t t-esc="fmt(sum_partner_account(data, partner, acc_group[0], 'debit - credit'))"/>
+                                            </td>
+                                        </tr>
+                                        <!-- Lignes de détail -->
+                                        <tr t-foreach="lines_for_account(data, partner, acc_group[0])" t-as="line">
+                                            <td style="padding-left: 24px; color: #555;">
+                                                <span t-esc="line['date']"/>
+                                            </td>
+                                            <td><span t-esc="line['code']"/></td>
+                                            <td><span t-esc="line['a_code']"/></td>
+                                            <td><span t-esc="line['displayed_name']"/></td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <span t-esc="fmt(line['debit'])"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <span t-esc="fmt(line['credit'] - line.get('facture_avoir', 0.0))"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <span t-esc="fmt(line.get('facture_avoir', 0.0))"/>
+                                            </td>
+                                            <td class="text-end" style="white-space: nowrap;">
+                                                <span t-esc="fmt(line['progress'])"/>
+                                            </td>
+                                            <td class="text-end" t-if="data['form']['amount_currency']">
+                                                <t t-if="line['currency_id']">
+                                                    <span t-esc="fmt(line['amount_currency'])"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

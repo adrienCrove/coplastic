@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_report_partner_ledger_view_inherit" model="ir.ui.view">
+        <field name="name">account.report.partner.ledger.coplastic</field>
+        <field name="model">account.report.partner.ledger</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_report_partner_ledger_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reconciled']" position="after">
+                <newline/>
+                <field name="partner_ids"
+                       widget="many2many_tags"
+                       options="{'no_create': True}"
+                       placeholder="Tous les fournisseurs si vide..."
+                       invisible="result_selection != 'supplier'"
+                       domain="[('supplier_rank', '>', 0)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

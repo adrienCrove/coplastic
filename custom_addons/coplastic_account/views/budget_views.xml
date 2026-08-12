@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Rendre le compte analytique optionnel dans les lignes de budget -->
+    <record id="view_budget_line_analytic_optional" model="ir.ui.view">
+        <field name="name">budget.lines.analytic.optional</field>
+        <field name="model">budget.lines</field>
+        <field name="inherit_id" ref="base_account_budget.view_budget_line_form"/>
+        <field name="arch" type="xml">
+            <field name="analytic_account_id" position="attributes">
+                <attribute name="required">0</attribute>
+            </field>
+        </field>
+    </record>
+
+</odoo>
