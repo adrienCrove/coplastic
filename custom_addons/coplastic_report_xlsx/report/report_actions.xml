@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_general_ledger_xlsx" model="ir.actions.report">
+        <field name="name">General Ledger XLSX</field>
+        <field name="model">account.report.general.ledger</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">coplastic_report_xlsx.report_general_ledger_xlsx</field>
+        <field name="report_file">coplastic_report_xlsx.report_general_ledger_xlsx</field>
+        <field name="binding_model_id" ref="base_accounting_kit.model_account_report_general_ledger"/>
+        <field name="binding_type">report</field>
+        <field name="attachment_use" eval="False"/>
+    </record>
+
+    <record id="action_report_partner_ledger_xlsx" model="ir.actions.report">
+        <field name="name">Partner Ledger XLSX</field>
+        <field name="model">account.report.partner.ledger</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">coplastic_report_xlsx.report_partner_ledger_xlsx</field>
+        <field name="report_file">coplastic_report_xlsx.report_partner_ledger_xlsx</field>
+        <field name="binding_model_id" ref="base_accounting_kit.model_account_report_partner_ledger"/>
+        <field name="binding_type">report</field>
+        <field name="attachment_use" eval="False"/>
+    </record>
+
+    <record id="action_report_trial_balance_xlsx" model="ir.actions.report">
+        <field name="name">Trial Balance XLSX</field>
+        <field name="model">account.balance.report</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">coplastic_report_xlsx.report_trial_balance_xlsx</field>
+        <field name="report_file">coplastic_report_xlsx.report_trial_balance_xlsx</field>
+        <field name="binding_model_id" ref="base_accounting_kit.model_account_balance_report"/>
+        <field name="binding_type">report</field>
+        <field name="attachment_use" eval="False"/>
+    </record>
+</odoo>

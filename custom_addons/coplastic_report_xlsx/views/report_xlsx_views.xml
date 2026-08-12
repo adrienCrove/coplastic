@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_report_general_ledger_view_xlsx" model="ir.ui.view">
+        <field name="name">account.report.general.ledger.xlsx</field>
+        <field name="model">account.report.general.ledger</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_report_general_ledger_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button[@name='check_report']" position="after">
+                <button name="check_report_xlsx" string="Excel" type="object" class="btn btn-secondary" data-hotkey="e"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_report_partner_ledger_view_xlsx" model="ir.ui.view">
+        <field name="name">account.report.partner.ledger.xlsx</field>
+        <field name="model">account.report.partner.ledger</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_report_partner_ledger_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button[@name='check_report']" position="after">
+                <button name="check_report_xlsx" string="Excel" type="object" class="btn btn-secondary" data-hotkey="e"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_report_trial_balance_view_xlsx" model="ir.ui.view">
+        <field name="name">account.balance.report.xlsx</field>
+        <field name="model">account.balance.report</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_report_balance_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button[@name='check_report']" position="after">
+                <button name="check_report_xlsx" string="Excel" type="object" class="btn btn-secondary" data-hotkey="e"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

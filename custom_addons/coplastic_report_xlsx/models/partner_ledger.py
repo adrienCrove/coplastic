@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+
+from odoo import models
+from odoo.tools.misc import get_lang
+
+
+class AccountReportPartnerLedgerXlsx(models.TransientModel):
+    _inherit = "account.report.partner.ledger"
+
+    def check_report_xlsx(self):
+        self.ensure_one()
+        data = {}
+        data["ids"] = self.env.context.get("active_ids", [])
+        data["model"] = self.env.context.get("active_model", "ir.ui.menu")
+        data["form"] = self.read(
+            ["date_from", "date_to", "journal_ids", "target_move", "company_id"]
+        )[0]
+        used_context = self._build_contexts(data)
+        data["form"]["used_context"] = dict(used_context, lang=get_lang(self.env).code)
+        data = self.pre_print_report(data)
+        data["form"].update(self.read(["reconciled", "amount_currency"])[0])
+        return self.with_context(discard_logo_check=True).env.ref(
+            "coplastic_report_xlsx.action_report_partner_ledger_xlsx"
+        ).report_action(self, data=data)
