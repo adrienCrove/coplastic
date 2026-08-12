@@ -123,6 +123,48 @@
                             </t>
                         </t>
                     </div>
+                    <!-- Sous-totaux par groupe (Charges, Produits, etc.) -->
+                    <t t-if="group_totals_list">
+                        <div class="act_as_table data_table" style="width: 100%; margin-top: 16px;">
+                            <div class="act_as_thead">
+                                <div class="act_as_row labels">
+                                    <div class="act_as_cell" style="width: 33%;">Sous-totaux</div>
+                                    <div class="act_as_cell" style="width: 9%;">Solde initial</div>
+                                    <div class="act_as_cell" style="width: 9%;">Débit</div>
+                                    <div class="act_as_cell" style="width: 9%;">Crédit</div>
+                                    <div class="act_as_cell" style="width: 9%;">Solde période</div>
+                                    <div class="act_as_cell" style="width: 9%;">Solde final</div>
+                                </div>
+                            </div>
+                            <t t-foreach="group_totals_list" t-as="gt">
+                                <div class="act_as_row lines" style="font-weight: bold; background-color: #f5f5f5; border-top: 1px solid #ccc;">
+                                    <div class="act_as_cell left" style="width: 33%;">
+                                        <t t-out="gt['name']" />
+                                    </div>
+                                    <div class="act_as_cell amount" style="width: 9%;">
+                                        <t t-out="gt['initial_balance']"
+                                            t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                    <div class="act_as_cell amount" style="width: 9%;">
+                                        <t t-out="gt['debit']"
+                                            t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                    <div class="act_as_cell amount" style="width: 9%;">
+                                        <t t-out="gt['credit']"
+                                            t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                    <div class="act_as_cell amount" style="width: 9%;">
+                                        <t t-out="gt['balance']"
+                                            t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                    <div class="act_as_cell amount" style="width: 9%;">
+                                        <t t-out="gt['ending_balance']"
+                                            t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
                 </t>
             </t>
             <!-- Display partner lines -->

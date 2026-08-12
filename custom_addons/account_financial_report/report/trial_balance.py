@@ -912,6 +912,7 @@ class TrialBalanceReport(models.AbstractModel):
         )
         trial_balance_grouped = False
         total_amount_grouped = False
+        group_totals_list = []
         if grouped_by:
             trial_balance_grouped, total_amount_grouped = self._get_data_grouped(
                 total_amount, accounts_data, foreign_currency
@@ -963,6 +964,35 @@ class TrialBalanceReport(models.AbstractModel):
             else:
                 trial_balance = list(accounts_data.values())
                 trial_balance = sorted(trial_balance, key=lambda k: k["code"])
+                # Compute group subtotals (Total Charges, Total Produits, etc.)
+                group_labels = {
+                    "equity": _("Total Capitaux propres"),
+                    "asset": _("Total Actif"),
+                    "liability": _("Total Passif"),
+                    "expense": _("Total Charges"),
+                    "income": _("Total Produits"),
+                }
+                f_names = [
+                    "initial_balance", "debit", "credit",
+                    "balance", "ending_balance",
+                ]
+                _group_totals_dict = {}
+                for tb in trial_balance:
+                    ig = tb.get("internal_group", "")
+                    if not ig:
+                        continue
+                    if ig not in _group_totals_dict:
+                        _group_totals_dict[ig] = {
+                            "name": group_labels.get(ig, ig),
+                            **{f: 0.0 for f in f_names},
+                        }
+                    for f in f_names:
+                        _group_totals_dict[ig][f] += tb.get(f, 0.0)
+                group_totals_list = [
+                    _group_totals_dict[ig]
+                    for ig in ["equity", "asset", "liability", "expense", "income"]
+                    if ig in _group_totals_dict
+                ]
         else:
             if foreign_currency:
                 for account_id in accounts_data.keys():
@@ -998,6 +1028,7 @@ class TrialBalanceReport(models.AbstractModel):
                 "show_hierarchy_level": show_hierarchy_level,
                 "currency_model": self.env["res.currency"],
                 "grouped_by": grouped_by,
+                "group_totals_list": group_totals_list,
             }
         )
         return res

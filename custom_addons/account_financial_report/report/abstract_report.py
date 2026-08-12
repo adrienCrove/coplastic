@@ -137,6 +137,7 @@ class AgedPartnerBalanceReport(models.AbstractModel):
                         "currency_id": account.currency_id.id,
                         "currency_name": account.currency_id.name,
                         "centralized": account.centralized,
+                    "internal_group": account.internal_group,
                     }
                 }
             )
