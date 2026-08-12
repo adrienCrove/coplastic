@@ -7,7 +7,7 @@ from odoo import api, fields, models
 
 class ReportWastePurchaseWizard(models.TransientModel):
     _name = 'report.waste.purchase.wizard'
-    _description = 'Assistant rapport achats par produit'
+    _description = 'Assistant Grand Livre Achats'
 
     date_from = fields.Date(
         string='Du',
@@ -19,11 +19,16 @@ class ReportWastePurchaseWizard(models.TransientModel):
         required=True,
         default=lambda self: self._default_date_to(),
     )
-    product_id = fields.Many2one(
+    product_ids = fields.Many2many(
         'product.product',
-        string='Produit',
+        string='Produits',
         required=True,
     )
+
+    mode = fields.Selection([
+        ('summary', 'Résumé (1 ligne par produit)'),
+        ('detailed', 'Détaillé (1 ligne par produit / date)'),
+    ], string='Mode', default='summary', required=True)
 
     @api.model
     def _default_date_from(self):
@@ -42,8 +47,8 @@ class ReportWastePurchaseWizard(models.TransientModel):
             'date_to': self.date_to.strftime('%Y-%m-%d'),
             'date_from_fmt': self.date_from.strftime('%d/%m/%Y'),
             'date_to_fmt': self.date_to.strftime('%d/%m/%Y'),
-            'product_id': self.product_id.id,
-            'product_name': self.product_id.name,
+            'product_ids': self.product_ids.ids,
+            'mode': self.mode,
         }
         return self.env.ref(
             'coplastic_stock.action_report_waste_purchase'

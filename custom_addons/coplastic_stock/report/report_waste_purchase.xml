@@ -1,101 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Paper format -->
-    <record id="paperformat_waste_purchase" model="report.paperformat">
-        <field name="name">Rapport Achats Produit A4</field>
-        <field name="default">False</field>
-        <field name="format">A4</field>
-        <field name="orientation">Portrait</field>
-        <field name="margin_top">10</field>
-        <field name="margin_bottom">10</field>
-        <field name="margin_left">10</field>
-        <field name="margin_right">10</field>
-        <field name="header_line">False</field>
-        <field name="header_spacing">3</field>
-        <field name="dpi">90</field>
-    </record>
-
     <!-- Report action -->
     <record id="action_report_waste_purchase" model="ir.actions.report">
-        <field name="name">Rapport Stock par Produit</field>
+        <field name="name">Grand Livre Achats</field>
         <field name="model">report.waste.purchase.wizard</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">coplastic_stock.report_waste_purchase_document</field>
         <field name="report_file">coplastic_stock.report_waste_purchase_document</field>
-        <field name="print_report_name">'Achats_%s_%s_%s' % (object.product_id.name or '', object.date_from, object.date_to)</field>
-        <field name="paperformat_id" ref="coplastic_stock.paperformat_waste_purchase"/>
+        <field name="print_report_name">'Grand_Livre_%s_%s' % (object.date_from, object.date_to)</field>
     </record>
 
     <!-- QWeb template -->
     <template id="report_waste_purchase_document">
         <t t-call="web.html_container">
-            <div class="page" style="
-                font-family: Arial, 'Liberation Sans', sans-serif;
-                font-size: 11px;
-                color: #222222;
-                padding: 5mm;
-            ">
-                <!-- EN-TETE -->
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <strong style="font-size: 18px;">
-                        <span t-esc="company.name"/>
-                    </strong><br/>
-                    <span style="font-size: 15px; font-weight: bold; color: #1a5fad; margin-top: 8px; display: inline-block;">
-                        RAPPORT STOCK - <span t-esc="product_name"/>
-                    </span><br/>
-                    <span style="font-size: 12px; margin-top: 4px; display: inline-block;">
-                        Du <strong t-esc="date_from"/> au <strong t-esc="date_to"/>
-                    </span>
-                </div>
+            <t t-call="web.external_layout">
+                <div class="page" style="
+                    font-family: Arial, 'Liberation Sans', sans-serif;
+                    font-size: 11px;
+                    color: #222222;
+                ">
 
-                <!-- TABLEAU -->
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #1a5fad; color: white;">
-                            <th style="border: 1px solid #999; padding: 7px 10px; text-align: left; font-size: 11px; width: 20%;">Date</th>
-                            <th style="border: 1px solid #999; padding: 7px 10px; text-align: left; font-size: 11px;">Fournisseur</th>
-                            <th style="border: 1px solid #999; padding: 7px 10px; text-align: right; font-size: 11px; width: 20%;">Quantit&#233;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="rows" t-as="r">
-                            <tr>
-                                <td style="border: 1px solid #ccc; padding: 5px 10px;">
-                                    <span t-esc="r['date'].strftime('%d/%m/%Y')"/>
-                                </td>
-                                <td style="border: 1px solid #ccc; padding: 5px 10px;">
-                                    <span t-esc="r['partner']"/>
-                                </td>
-                                <td style="border: 1px solid #ccc; padding: 5px 10px; text-align: right;">
-                                    <span t-esc="fmt(r['qty'])"/>
-                                </td>
-                            </tr>
-                        </t>
-                    </tbody>
-                    <!-- TOTAL -->
-                    <tfoot>
-                        <t t-if="rows">
-                            <tr style="background-color: #1a5fad; color: white; font-weight: bold; font-size: 12px;">
-                                <td colspan="2" style="border: 1px solid #999; padding: 8px 10px;">
-                                    TOTAL
-                                </td>
-                                <td style="border: 1px solid #999; padding: 8px 10px; text-align: right;">
-                                    <span t-esc="fmt(grand_total_qty)"/>
-                                </td>
-                            </tr>
-                        </t>
-                    </tfoot>
-                </table>
-
-                <!-- Message si aucune donnee -->
-                <t t-if="not rows">
-                    <div style="text-align: center; padding: 40px; color: #888; font-size: 14px;">
-                        Aucun achat trouv&#233; pour ce produit sur cette p&#233;riode.
+                    <!-- TITRE -->
+                    <div style="text-align: center; margin: 10px 0 16px 0;">
+                        <span style="font-size: 20px; font-weight: bold; color: #1B7B3D; letter-spacing: 1px;">
+                            GRAND LIVRE ACHATS
+                        </span><br/>
+                        <span style="font-size: 12px; margin-top: 4px; display: inline-block;">
+                            Période du <strong t-esc="date_from"/> au <strong t-esc="date_to"/>
+                        </span>
                     </div>
-                </t>
 
-            </div>
+                    <!-- TABLEAU -->
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #1B7B3D; color: white;">
+                                <t t-if="mode == 'detailed'">
+                                    <th style="border: 1px solid #145C2E; padding: 7px 10px; text-align: left; font-size: 11px; width: 15%;">Date</th>
+                                </t>
+                                <th style="border: 1px solid #145C2E; padding: 7px 10px; text-align: left; font-size: 11px;">Produit</th>
+                                <th style="border: 1px solid #145C2E; padding: 7px 10px; text-align: right; font-size: 11px; width: 18%;">Quantité</th>
+                                <th style="border: 1px solid #145C2E; padding: 7px 10px; text-align: right; font-size: 11px; width: 22%;">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="rows" t-as="r">
+                                <tr t-attf-style="background-color: {{ 'white' if r_index % 2 == 0 else '#f7f7f7' }};">
+                                    <t t-if="mode == 'detailed'">
+                                        <td style="border: 1px solid #ddd; padding: 5px 10px;">
+                                            <span t-esc="r['date']"/>
+                                        </td>
+                                    </t>
+                                    <td style="border: 1px solid #ddd; padding: 5px 10px; font-weight: bold;">
+                                        <span t-esc="r['product']"/>
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 5px 10px; text-align: right;">
+                                        <span t-esc="fmt(r['qty'])"/>
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 5px 10px; text-align: right;">
+                                        <span t-esc="fmt(r['amount'])"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <!-- TOTAL -->
+                        <tfoot>
+                            <t t-if="rows">
+                                <tr style="background-color: #1B7B3D; color: white; font-weight: bold; font-size: 12px;">
+                                    <t t-if="mode == 'detailed'">
+                                        <td style="border: 1px solid #145C2E; padding: 8px 10px;"/>
+                                    </t>
+                                    <td style="border: 1px solid #145C2E; padding: 8px 10px;">
+                                        TOTAL
+                                    </td>
+                                    <td style="border: 1px solid #145C2E; padding: 8px 10px; text-align: right;">
+                                        <span t-esc="fmt(grand_total_qty)"/>
+                                    </td>
+                                    <td style="border: 1px solid #145C2E; padding: 8px 10px; text-align: right;">
+                                        <span t-esc="fmt(grand_total_amount)"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tfoot>
+                    </table>
+
+                    <!-- Message si aucune donnée -->
+                    <t t-if="not rows">
+                        <div style="text-align: center; padding: 40px; color: #888; font-size: 14px;">
+                            Aucun achat trouvé pour les produits sélectionnés sur cette période.
+                        </div>
+                    </t>
+
+                </div>
+            </t>
         </t>
     </template>
 

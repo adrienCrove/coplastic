@@ -5,13 +5,14 @@
         <field name="name">report.waste.purchase.wizard.form</field>
         <field name="model">report.waste.purchase.wizard</field>
         <field name="arch" type="xml">
-            <form string="Rapport Stock par Produit">
+            <form string="Grand Livre Achats">
+                <group col="4">
+                    <field name="mode" widget="radio"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
                 <group>
-                    <group>
-                        <field name="product_id"/>
-                        <field name="date_from"/>
-                        <field name="date_to"/>
-                    </group>
+                    <field name="product_ids" widget="many2many_tags"/>
                 </group>
                 <footer>
                     <button name="action_print" string="Imprimer" type="object" class="btn-primary" icon="fa-print"/>
@@ -22,15 +23,15 @@
     </record>
 
     <record id="action_open_waste_purchase_wizard" model="ir.actions.act_window">
-        <field name="name">Rapport Stock par Produit</field>
+        <field name="name">Grand Livre Achats</field>
         <field name="res_model">report.waste.purchase.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
 
     <menuitem id="menu_waste_purchase_report"
-              name="Rapport Stock par Produit"
-              parent="stock.menu_stock_warehouse_mgmt"
+              name="Grand Livre Achats"
+              parent="stock.menu_warehouse_report"
               action="action_open_waste_purchase_wizard"
               sequence="99"/>
 

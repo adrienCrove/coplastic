@@ -19,6 +19,27 @@ class CoplasticStockAlert(models.AbstractModel):
     _description = "Alertes de stock Coplastic"
 
     @api.model
+    def _get_alert_recipients(self):
+        """Retourne les utilisateurs destinataires des alertes stock.
+        Priorité : sélection manuelle dans les paramètres, sinon responsables stock + admins.
+        """
+        param = self.env['ir.config_parameter'].sudo().get_param(
+            'coplastic_stock.stock_alert_user_ids', ''
+        )
+        user_ids = [int(i) for i in param.split(',') if i.strip().isdigit()]
+        if user_ids:
+            return self.env['res.users'].browse(user_ids).exists()
+        # Fallback : groupes par défaut
+        group_stock = self.env.ref('stock.group_stock_manager', raise_if_not_found=False)
+        group_admin = self.env.ref('base.group_system', raise_if_not_found=False)
+        recipients = self.env['res.users']
+        if group_stock:
+            recipients |= group_stock.users
+        if group_admin:
+            recipients |= group_admin.users
+        return recipients
+
+    @api.model
     def _check_stock_levels(self):
         """Cron quotidien : vérifie les stocks et envoie un email si des produits sont en pénurie."""
         # Trouver les produits avec un seuil configuré
@@ -75,14 +96,14 @@ class CoplasticStockAlert(models.AbstractModel):
         """ % rows
 
         # Destinataires : tous les responsables stock + administrateurs
-        group_stock = self.env.ref('stock.group_stock_manager', raise_if_not_found=False)
-        group_admin = self.env.ref('base.group_system', raise_if_not_found=False)
-        recipients = self.env['res.users']
-        if group_stock:
-            recipients |= group_stock.users
-        if group_admin:
-            recipients |= group_admin.users
-
+        # group_stock = self.env.ref('stock.group_stock_manager', raise_if_not_found=False)
+        # group_admin = self.env.ref('base.group_system', raise_if_not_found=False)
+        # recipients = self.env['res.users']
+        # if group_stock:
+        #     recipients |= group_stock.users
+        # if group_admin:
+        #     recipients |= group_admin.users
+        recipients = self.env['coplastic.stock.alert']._get_alert_recipients()
         emails = ','.join(filter(None, recipients.mapped('email')))
         if not emails:
             return
@@ -158,14 +179,14 @@ class CoplasticStockMove(models.Model):
             return res
 
         # Destinataires : responsables stock + admins
-        group_stock = self.env.ref('stock.group_stock_manager', raise_if_not_found=False)
-        group_admin = self.env.ref('base.group_system', raise_if_not_found=False)
-        recipients = self.env['res.users']
-        if group_stock:
-            recipients |= group_stock.users
-        if group_admin:
-            recipients |= group_admin.users
-
+        # group_stock = self.env.ref('stock.group_stock_manager', raise_if_not_found=False)
+        # group_admin = self.env.ref('base.group_system', raise_if_not_found=False)
+        # recipients = self.env['res.users']
+        # if group_stock:
+        #     recipients |= group_stock.users
+        # if group_admin:
+        #     recipients |= group_admin.users
+        recipients = self.env['coplastic.stock.alert']._get_alert_recipients()
         partners = recipients.mapped('partner_id')
 
         for product in products_to_check:

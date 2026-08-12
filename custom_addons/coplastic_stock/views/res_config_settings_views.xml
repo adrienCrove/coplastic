@@ -12,6 +12,12 @@
                         <field name="stock_alert_qty_default"/>
                         <label for="stock_alert_qty_default" string="unités (0 = désactivé)"/>
                     </setting>
+                    <setting string="Destinataires des alertes"
+                             help="Sélectionnez les utilisateurs qui recevront les emails et notifications d'alerte de stock. Si aucun utilisateur n'est sélectionné, les responsables stock et administrateurs sont notifiés par défaut.">
+                        <field name="stock_alert_user_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               domain="[('share', '=', False)]"/>
+                    </setting>
                 </block>
             </xpath>
         </field>
