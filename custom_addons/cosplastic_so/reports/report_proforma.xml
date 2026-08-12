@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action rapport Proforma -->
+    <record id="action_report_proforma_sale" model="ir.actions.report">
+        <field name="name">Proforma</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cosplastic_so.report_proforma</field>
+        <field name="report_file">cosplastic_so.report_proforma</field>
+        <field name="print_report_name">'Proforma-%s' % (object.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Wrapper : itère sur docs et appelle le template document -->
+    <template id="report_proforma">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="cosplastic_so.report_proforma_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Override du titre : remplace "Devis #" par "Proforma #" -->
+    <template id="report_proforma_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//h2" position="replace">
+            <h2 class="mt-4">
+                Proforma # <span t-field="doc.name">SO0000</span>
+            </h2>
+        </xpath>
+    </template>
+
+</odoo>

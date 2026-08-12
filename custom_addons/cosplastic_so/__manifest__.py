@@ -25,5 +25,6 @@
         'data/payment_terms.xml',
         'views/sale_stock_check_wizard_views.xml',
         'views/views.xml',
+        'reports/report_proforma.xml',
     ],
 }
