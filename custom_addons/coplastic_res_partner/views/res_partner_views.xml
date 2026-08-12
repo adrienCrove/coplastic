@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_consumption_button" model="ir.ui.view">
+        <field name="name">res.partner.consumption.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <field name="customer_rank" invisible="1"/>
+                <button name="action_view_monthly_consumption"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-bar-chart"
+                        invisible="customer_rank == 0">
+                    <field name="sale_monthly_count"
+                           widget="statinfo"
+                           string="Cmd ce mois"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+</odoo>
