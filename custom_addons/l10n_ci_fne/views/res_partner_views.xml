@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_partner_form_fne" model="ir.ui.view">
+        <field name="name">res.partner.form.fne</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Alerte NCC manquant pour les entreprises -->
+            <xpath expr="//sheet" position="before">
+                <field name="fne_ncc_warning" invisible="1"/>
+                <div class="alert alert-warning text-center" role="alert"
+                     invisible="not fne_ncc_warning">
+                    <strong>NCC manquant !</strong>
+                    Le NCC (Numéro de Compte Contribuable) est obligatoire pour la certification FNE des factures B2B.
+                </div>
+            </xpath>
+            <!-- Ajouter le champ Administration publique après category_id -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="fne_is_government"
+                       invisible="not is_company"
+                       string="Administration publique (B2G)"
+                       help="Cocher si ce client est une administration publique ou un organisme gouvernemental"/>
+                <field name="fne_tax_regime"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

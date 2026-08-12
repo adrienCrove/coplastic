@@ -3,15 +3,9 @@
     <data noupdate="1">
 
         <!-- Valeurs par défaut pour la configuration FNE -->
-        <record id="default_fne_auto_certify" model="ir.config_parameter">
-            <field name="key">l10n_ci_fne.auto_certify</field>
-            <field name="value">False</field>
-        </record>
-
-        <record id="default_fne_simulation" model="ir.config_parameter">
-            <field name="key">l10n_ci_fne.simulation</field>
-            <field name="value">True</field>
-        </record>
+        <!-- Note: Les champs Boolean (simulation, auto_certify) ne sont PAS créés ici
+             car Odoo interprète bool('False') = True.
+             Ils utilisent le default=False défini dans res_config_settings.py -->
 
         <record id="default_fne_point_of_sale" model="ir.config_parameter">
             <field name="key">l10n_ci_fne.point_of_sale</field>
