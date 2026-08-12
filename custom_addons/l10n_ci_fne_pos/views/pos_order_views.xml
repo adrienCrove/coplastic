@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_pos_pos_form_fne" model="ir.ui.view">
+        <field name="name">pos.order.form.fne</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_fne_certify"
+                        string="Certifier FNE"
+                        type="object"
+                        class="btn-warning"
+                        invisible="fne_certified or state not in ('paid', 'done', 'invoiced')"
+                        groups="point_of_sale.group_pos_manager"/>
+                <button name="action_fne_print_receipt"
+                        string="Imprimer reçu FNE"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not fne_certified"/>
+                <button name="action_fne_reset_simulation"
+                        string="Annuler simulation FNE"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="not fne_simulation"
+                        groups="point_of_sale.group_pos_manager"
+                        confirm="Cela va réinitialiser la certification simulation. Vous pourrez ensuite certifier le ticket auprès de la DGI."/>
+            </xpath>
+
+            <xpath expr="//sheet" position="before">
+                <field name="fne_certified" invisible="1"/>
+                <field name="fne_simulation" invisible="1"/>
+                <div class="alert alert-warning text-center mb-0" role="alert"
+                     invisible="fne_certified or state not in ('paid', 'done', 'invoiced')">
+                    Ce ticket n'a pas été certifié FNE auprès de la DGI.
+                </div>
+                <div class="alert alert-danger text-center mb-0" role="alert"
+                     invisible="not fne_error_message">
+                    <field name="fne_error_message" readonly="1" nolabel="1"/>
+                </div>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="FNE / DGI" name="fne_tab">
+                    <group>
+                        <group string="Certification FNE">
+                            <field name="fne_reference"/>
+                            <field name="fne_ncc"/>
+                            <field name="fne_certification_date"/>
+                            <field name="fne_payment_method"/>
+                            <field name="fne_balance_sticker"/>
+                        </group>
+                        <group string="QR Code de vérification">
+                            <field name="fne_qr_code" widget="image" class="oe_avatar"
+                                   invisible="not fne_qr_code"/>
+                            <field name="fne_token" widget="url"
+                                   invisible="not fne_token"/>
+                        </group>
+                    </group>
+                    <field name="fne_invoice_id" invisible="1"/>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_pos_order_tree_fne" model="ir.ui.view">
+        <field name="name">pos.order.tree.fne</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="fne_certified" string="FNE" widget="boolean_toggle"
+                       readonly="1" optional="show"/>
+                <field name="fne_reference" string="Réf. FNE" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

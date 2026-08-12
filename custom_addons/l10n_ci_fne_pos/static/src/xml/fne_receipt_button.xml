@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="l10n_ci_fne_pos.FneReceiptButton">
+        <button class="control-button btn btn-light rounded-0 fw-bolder"
+                t-on-click="() => this.click()"
+                t-ref="fne-button">
+            <i class="fa fa-certificate me-1"/>
+            <span> </span>
+            <span><t t-esc="commandName"/></span>
+        </button>
+    </t>
+
+    <t t-name="l10n_ci_fne_pos.TicketScreenFne"
+       t-inherit="point_of_sale.TicketScreen"
+       t-inherit-mode="extension">
+        <xpath expr="//ReprintReceiptButton" position="after">
+            <FneReceiptButton order="_selectedSyncedOrder"/>
+        </xpath>
+    </t>
+
+</templates>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Bloc FNE du ticket 80mm : n'apparaît que si le ticket a été certifié.
+         Inséré sur le point d'extension `before-footer` prévu par Odoo. -->
+    <t t-name="l10n_ci_fne_pos.OrderReceiptFne"
+       t-inherit="point_of_sale.OrderReceipt"
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('before-footer')]" position="after">
+            <div t-if="props.data.fne_display and props.data.fne_certified"
+                 class="pos-receipt-center-align mt-2"
+                 style="border-top: 1px dashed #000; padding-top: 6px;">
+
+                <img src="/l10n_ci_fne/static/img/fne_logo.png"
+                     alt="Facture Normalisée Électronique"
+                     style="width: 130px; max-width: 100%;"/>
+
+                <div t-if="props.data.fne_simulation" style="font-weight: bold;">
+                    *** SIMULATION - NON TRANSMIS A LA DGI ***
+                </div>
+
+                <div class="pos-receipt-order-data" style="margin-top: 4px;">
+                    <div style="font-weight: bold;">N° <t t-out="props.data.fne_reference"/></div>
+                    <div t-if="props.data.fne_ncc">NCC : <t t-out="props.data.fne_ncc"/></div>
+                    <div t-if="props.data.fne_certification_date">
+                        <t t-out="props.data.fne_certification_date"/>
+                    </div>
+                </div>
+
+                <img t-if="props.data.fne_qr_code"
+                     t-att-src="props.data.fne_qr_code"
+                     class="pos-receipt-qrcode"
+                     alt="QR Code FNE"/>
+            </div>
+        </xpath>
+    </t>
+
+</templates>

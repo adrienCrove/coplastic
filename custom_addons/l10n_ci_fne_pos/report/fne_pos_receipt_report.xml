@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="action_report_pos_receipt_fne" model="ir.actions.report">
+        <field name="name">Reçu normalisé (FNE)</field>
+        <field name="model">pos.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ci_fne_pos.report_pos_receipt_fne_document</field>
+        <field name="report_file">l10n_ci_fne_pos.report_pos_receipt_fne_document</field>
+        <field name="paperformat_id" ref="l10n_ci_fne.paperformat_fne_invoice"/>
+        <field name="binding_model_id" ref="point_of_sale.model_pos_order"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'FNE - %s' % (object.fne_reference or object.name)</field>
+    </record>
+
+    <!-- Même corps que la facture normalisée : pos.order expose les mêmes
+         méthodes (_fne_get_report_data, _fne_format_*) et le même champ
+         fne_qr_code, le template partagé s'applique tel quel. -->
+    <template id="report_pos_receipt_fne_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="d" t-value="o._fne_get_report_data()"/>
+                <div class="article"
+                     t-att-data-oe-model="o._name"
+                     t-att-data-oe-id="o.id"
+                     t-att-data-oe-lang="o.env.context.get('lang')">
+                    <t t-call="l10n_ci_fne.fne_document_body"/>
+                </div>
+                <div t-if="not o_last" style="page-break-after: always;"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>
