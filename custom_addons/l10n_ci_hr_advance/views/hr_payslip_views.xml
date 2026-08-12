@@ -5,7 +5,7 @@
     <record id="hr_payslip_form_advance" model="ir.ui.view">
         <field name="name">hr.payslip.form.advance</field>
         <field name="model">hr.payslip</field>
-        <field name="inherit_id" ref="payroll.view_hr_payslip_form"/>
+        <field name="inherit_id" ref="payroll.hr_payslip_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_advances" type="object"

@@ -96,7 +96,7 @@
 
     <menuitem id="menu_hr_salary_advance"
               name="Avances sur Salaire"
-              parent="payroll.menu_hr_payroll_root"
+              parent="payroll.payroll_menu_root"
               action="hr_salary_advance_action"
               sequence="40"/>
 
