@@ -40,6 +40,15 @@
                                 <field name="l10n_ci_fne_point_of_sale" class="col-5"
                                        placeholder="Ex: 1"/>
                             </div>
+                            <div class="row mt8">
+                                <label for="l10n_ci_fne_tax_regime" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="l10n_ci_fne_tax_regime" class="col-5"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="l10n_ci_fne_tax_center" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="l10n_ci_fne_tax_center" class="col-5"
+                                       placeholder="Ex: 822 Recette des Grandes Entreprises"/>
+                            </div>
                         </div>
                     </setting>
                     <setting string="Mode simulation"

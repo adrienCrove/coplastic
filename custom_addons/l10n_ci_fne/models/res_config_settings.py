@@ -2,6 +2,8 @@
 
 from odoo import api, fields, models
 
+from .res_partner import FNE_TAX_REGIMES
+
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
@@ -33,6 +35,19 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='l10n_ci_fne.establishment',
         help="Nom de l'établissement"
     )
+    l10n_ci_fne_tax_regime = fields.Selection(
+        FNE_TAX_REGIMES,
+        string="Régime d'imposition",
+        config_parameter='l10n_ci_fne.tax_regime',
+        help="Régime d'imposition de votre entreprise, imprimé en tête "
+             "de la facture normalisée."
+    )
+    l10n_ci_fne_tax_center = fields.Char(
+        string="Centre des impôts",
+        config_parameter='l10n_ci_fne.tax_center',
+        help="Centre des impôts de rattachement, imprimé en tête de la "
+             "facture normalisée (ex: 822 Recette des Grandes Entreprises)."
+    )
     l10n_ci_fne_auto_certify = fields.Boolean(
         string="Certification automatique",
         config_parameter='l10n_ci_fne.auto_certify',
@@ -43,7 +58,7 @@ class ResConfigSettings(models.TransientModel):
     l10n_ci_fne_simulation = fields.Boolean(
         string="Mode simulation",
         config_parameter='l10n_ci_fne.simulation',
-        default=True,
+        default=False,
         help="En mode simulation, les requêtes sont préparées et loguées "
              "mais PAS envoyées à la DGI. Utile pour vérifier les données avant la mise en production."
     )
