@@ -17,20 +17,22 @@
         </xpath>
     </template>
 
+    <!-- CONTENU DU PIED DE PAGE : template réutilisable -->
+    <template id="coplastic_footer_content" name="Coplastic Footer Content">
+        <div style="text-align: center; font-size: 9pt; color: #333; line-height: 1.5; border-top: 1px solid #1B7B3D; padding-top: 5px;">
+            <p style="margin: 0; font-weight: bold;">SARL AU CAPITAL DE 1.000.000 DE FRANCS CFA</p>
+            <p style="margin: 0;">Régime d'imposition : REEL NORMAL – Centre Impôts : DGE Plateau</p>
+            <p style="margin: 0;">Registre de Commerce CI-ABJ-2015-B-2773 – Cpte Contribuable 1504800 C</p>
+            <p style="margin: 0;">YOPOUGON ZONE INDUSTRIELLE PK24 / TEL : (+225) 07 97 637 498</p>
+            <p style="margin: 0;">E-MAIL : direction@coplastique.com</p>
+        </div>
+    </template>
+
     <!-- PIED DE PAGE : Informations légales Coplastic centrées -->
     <template id="coplastic_layout_footer" inherit_id="web.external_layout_standard" name="Coplastic Footer">
         <xpath expr="//div[contains(@t-attf-class, 'footer')]" position="replace">
             <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
-                <div style="text-align: center; font-size: 9pt; color: #333; line-height: 1.5; border-top: 1px solid #003366; padding-top: 5px;">
-                    <p style="margin: 0; font-weight: bold;">SARL AU CAPITAL DE 1.000.000 DE FRANCS CFA</p>
-                    <p style="margin: 0;">Régime d’imposition : REEL NORMAL – Centre Impôts : DGE Plateau</p>
-                    <p style="margin: 0;">Registre de Commerce CI-ABJ-2015-B-2773 – Cpte Contribuable 1504800 C</p>
-                    <p style="margin: 0;">YOPOUGON ZONE INDUSTRIELLE PK24 / TEL : (+225) 07 97 637 498</p>
-                    <p style="margin: 0;">E-MAIL : direction@coplastique.com</p>
-                    <p style="margin: 3px 0 0 0; font-size: 8pt; color: #666;">
-                        Page <span class="page"/> / <span class="topage"/>
-                    </p>
-                </div>
+                <t t-call="coplastic_report.coplastic_footer_content"/>
             </div>
         </xpath>
     </template>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action rapport PDF -->
+    <record id="action_report_balance_tiers" model="ir.actions.report">
+        <field name="name">Balance des tiers</field>
+        <field name="model">coplastic.balance.tiers.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coplastic_report.report_balance_tiers</field>
+        <field name="report_file">coplastic_report.report_balance_tiers</field>
+        <field name="print_report_name">'Balance des tiers'</field>
+    </record>
+
+    <!-- Template QWeb -->
+    <template id="report_balance_tiers">
+        <t t-call="web.html_container">
+            <t t-set="data_report_margin_top" t-value="12"/>
+            <t t-set="data_report_header_spacing" t-value="9"/>
+            <t t-set="data_report_dpi" t-value="110"/>
+            <t t-call="web.external_layout">
+                <div class="page" style="margin-top: 60px;">
+                    <h2 style="text-align:center; color:#1B7B3D; margin-bottom:4px;">
+                        <span t-esc="env.company.name"/> : Balance des tiers
+                        <t t-if="tiers_type == 'client'"> (Clients)</t>
+                        <t t-if="tiers_type == 'supplier'"> (Fournisseurs)</t>
+                    </h2>
+                    <div class="row mt8 mb8" style="font-size:10px; color:#333;">
+                        <div class="col-4">
+                            <strong>Afficher le compte :</strong>
+                            <span t-if="data['display_account'] == 'all'"> Tous les comptes</span>
+                            <span t-if="data['display_account'] == 'movement'"> Avec des mouvements</span>
+                            <span t-if="data['display_account'] == 'not_zero'"> Solde non nul</span>
+                        </div>
+                        <div class="col-4" style="text-align:center;">
+                            <t t-if="data['date_from']">
+                                <strong>Du :</strong> <span t-esc="data['date_from']"/>
+                            </t>
+                            <t t-if="data['date_to']">
+                                &#160;&#160;<strong>Au :</strong> <span t-esc="data['date_to']"/>
+                            </t>
+                        </div>
+                        <div class="col-4" style="text-align:right;">
+                            <strong>Écritures :</strong>
+                            <span t-if="data['target_move'] == 'posted'"> Validées</span>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm table-reports" style="font-size:9.5px; width:100%;">
+                        <thead>
+                            <tr style="background-color:#1B7B3D; color:white; text-align:center;">
+                                <th rowspan="2" style="width:8%; vertical-align:middle; padding:4px;">N° Compte</th>
+                                <th rowspan="2" style="width:28%; vertical-align:middle; text-align:left; padding:4px;">Intitulé</th>
+                                <th colspan="3" style="text-align:center; border-left:1px solid #fff; padding:4px;">Mouvements</th>
+                                <th colspan="2" style="text-align:center; border-left:1px solid #fff; padding:4px;">Soldes</th>
+                            </tr>
+                            <tr style="background-color:#145C2E; color:white; text-align:center;">
+                                <th style="width:12%; border-left:1px solid #fff; padding:3px;">Débit</th>
+                                <th style="width:12%; padding:3px;">Crédit</th>
+                                <th style="width:12%; padding:3px;">Facture avoir</th>
+                                <th style="width:14%; border-left:1px solid #fff; padding:3px;">Débit</th>
+                                <th style="width:14%; padding:3px;">Crédit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- En-tête classe 4 -->
+                            <tr style="background-color:#d6ead9; font-weight:bold; font-size:9.5px;">
+                                <td colspan="7" style="padding:3px 6px; color:#145C2E;">
+                                    CLASSE 4 - TIERS
+                                </td>
+                            </tr>
+                            <!-- Une ligne par compte -->
+                            <tr t-foreach="tiers_accounts" t-as="account">
+                                <td style="text-align:left; padding:2px 4px;">
+                                    <t t-esc="account['code']"/>
+                                </td>
+                                <td style="padding:2px 4px;">
+                                    <t t-esc="account['name']"/>
+                                </td>
+                                <td class="text-end" style="padding:2px 4px;">
+                                    <span t-esc="account['debit']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:2px 4px;">
+                                    <span t-esc="account['credit'] - account.get('facture_avoir', 0.0)"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:2px 4px;">
+                                    <span t-esc="account.get('facture_avoir', 0.0)"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:2px 4px;">
+                                    <span t-esc="account['solde_debit']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:2px 4px;">
+                                    <span t-esc="account['solde_credit']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr style="font-weight:bold; border-top:2px solid #1B7B3D; background-color:#1B7B3D; color:white;">
+                                <td colspan="2" style="padding:4px 8px;">*** Total CLASSE 4 - TIERS ***</td>
+                                <td class="text-end" style="padding:4px;">
+                                    <span t-esc="tiers_totals['mvt_debit']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:4px;">
+                                    <span t-esc="tiers_totals['mvt_credit'] - tiers_totals['facture_avoir']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:4px;">
+                                    <span t-esc="tiers_totals['facture_avoir']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:4px;">
+                                    <span t-esc="tiers_totals['solde_debit']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                                <td class="text-end" style="padding:4px;">
+                                    <span t-esc="tiers_totals['solde_credit']"
+                                          t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Vue wizard Balance des tiers : hérite du parent avec mode primary -->
+    <record id="view_balance_tiers_wizard_form" model="ir.ui.view">
+        <field name="name">coplastic.balance.tiers.report.form</field>
+        <field name="model">coplastic.balance.tiers.report</field>
+        <field name="inherit_id" ref="base_accounting_kit.account_report_balance_view"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='target_move']" position="attributes">
+                    <attribute name="string">État des écritures</attribute>
+                </xpath>
+                <xpath expr="//field[@name='display_account']" position="attributes">
+                    <attribute name="string">Afficher les comptes</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_from']" position="attributes">
+                    <attribute name="string">Date de début</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_to']" position="attributes">
+                    <attribute name="string">Date de fin</attribute>
+                </xpath>
+                <xpath expr="//button[@name='check_report']" position="attributes">
+                    <attribute name="string">Imprimer</attribute>
+                </xpath>
+                <xpath expr="//button[@special='cancel']" position="attributes">
+                    <attribute name="string">Annuler</attribute>
+                </xpath>
+                <xpath expr="//field[@name='display_account']" position="after">
+                    <field name="tiers_type" string="Type de tiers"/>
+                    <field name="account_ids"
+                           widget="many2many_tags"
+                           options="{'no_create': True}"
+                           placeholder="Laisser vide = tous les comptes du type choisi"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Wizard action dédiée Balance des tiers -->
+    <record id="action_balance_tiers_wizard" model="ir.actions.act_window">
+        <field name="name">Balance des tiers</field>
+        <field name="res_model">coplastic.balance.tiers.report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_balance_tiers_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_balance_tiers"
+              name="Balance des tiers"
+              sequence="2"
+              action="action_balance_tiers_wizard"
+              parent="base_accounting_kit.account_reports_partner"/>
+</odoo>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_trial_balance"
+              inherit_id="base_accounting_kit.report_trial_balance">
+        <!-- Remplace le conteneur principal pour utiliser le layout Coplastic -->
+        <xpath expr="//t[@t-call='web.html_container']" position="replace">
+            <t t-call="web.html_container">
+                <t t-set="data_report_margin_top" t-value="12"/>
+                <t t-set="data_report_header_spacing" t-value="9"/>
+                <t t-set="data_report_dpi" t-value="110"/>
+                <t t-call="web.external_layout">
+                    <div class="page" style="margin-top: 60px;">
+                        <h2 style="text-align:center; color:#1B7B3D; margin-bottom:4px;">
+                            <span t-esc="env.company.name"/> : Balance générale
+                        </h2>
+                        <div class="row mt8 mb8" style="font-size:10px; color:#333;">
+                            <div class="col-4">
+                                <strong>Afficher le compte :</strong>
+                                <span t-if="data['display_account'] == 'all'"> Tous les comptes</span>
+                                <span t-if="data['display_account'] == 'movement'"> Avec des mouvements</span>
+                                <span t-if="data['display_account'] == 'not_zero'"> Solde non nul</span>
+                            </div>
+                            <div class="col-4" style="text-align:center;">
+                                <t t-if="data['date_from']">
+                                    <strong>Du :</strong> <span t-esc="data['date_from']"/>
+                                </t>
+                                <t t-if="data['date_to']">
+                                    &#160;&#160;<strong>Au :</strong> <span t-esc="data['date_to']"/>
+                                </t>
+                            </div>
+                            <div class="col-4" style="text-align:right;">
+                                <strong>Écritures :</strong>
+                                <span t-if="data['target_move'] == 'all'"> Toutes</span>
+                                <span t-if="data['target_move'] == 'posted'"> Validées</span>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-reports" style="font-size:9.5px; width:100%;">
+                            <thead>
+                                <tr style="background-color:#1B7B3D; color:white; text-align:center;">
+                                    <th rowspan="2" style="width:8%; vertical-align:middle; padding:4px;">N° Compte</th>
+                                    <th rowspan="2" style="width:32%; vertical-align:middle; text-align:left; padding:4px;">Intitulé des comptes</th>
+                                    <th colspan="2" style="text-align:center; border-left:1px solid #fff; padding:4px;">Mouvements</th>
+                                    <th colspan="2" style="text-align:center; border-left:1px solid #fff; padding:4px;">Soldes</th>
+                                </tr>
+                                <tr style="background-color:#145C2E; color:white; text-align:center;">
+                                    <th style="width:13%; border-left:1px solid #fff; padding:3px;">Débit</th>
+                                    <th style="width:13%; padding:3px;">Crédit</th>
+                                    <th style="width:13%; border-left:1px solid #fff; padding:3px;">Débit</th>
+                                    <th style="width:13%; padding:3px;">Crédit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="Classes" t-as="cls">
+                                    <!-- En-tête de classe -->
+                                    <tr style="background-color:#d6ead9; font-weight:bold; font-size:9.5px;">
+                                        <td colspan="6" style="padding:3px 6px; color:#145C2E;">
+                                            <t t-esc="cls['label']"/>
+                                        </td>
+                                    </tr>
+                                    <!-- Lignes de comptes -->
+                                    <tr t-foreach="cls['accounts']" t-as="account">
+                                        <td style="text-align:left; padding:2px 4px;"><t t-esc="account['code']"/></td>
+                                        <td style="padding:2px 4px;"><t t-esc="account['name']"/></td>
+                                        <td class="text-end" style="padding:2px 4px;">
+                                            <span t-esc="account['debit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                        <td class="text-end" style="padding:2px 4px;">
+                                            <span t-esc="account['credit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                        <td class="text-end" style="padding:2px 4px;">
+                                            <span t-esc="account['solde_debit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                        <td class="text-end" style="padding:2px 4px;">
+                                            <span t-esc="account['solde_credit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <!-- Sous-total de classe -->
+                                    <tr style="background-color:#eaf5eb; font-weight:bold; border-top:1px solid #1B7B3D;">
+                                        <td colspan="2" style="text-align:right; padding:3px 8px; color:#145C2E;">
+                                            *** Total <t t-esc="cls['label']"/> ***
+                                        </td>
+                                        <td class="text-end" style="padding:3px 4px;">
+                                            <span t-esc="cls['mvt_debit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                        <td class="text-end" style="padding:3px 4px;">
+                                            <span t-esc="cls['mvt_credit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                        <td class="text-end" style="padding:3px 4px;">
+                                            <span t-esc="cls['solde_debit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                        <td class="text-end" style="padding:3px 4px;">
+                                            <span t-esc="cls['solde_credit']"
+                                                  t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <!-- Pied de tableau : 3 lignes de totaux -->
+                            <tfoot>
+                                <tr style="font-weight:bold; border-top:2px solid #1B7B3D; background-color:#f0f0f0;">
+                                    <td colspan="2" style="padding:4px 8px;"><t t-esc="Bilan['label']"/></td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Bilan['mvt_debit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Bilan['mvt_credit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Bilan['solde_debit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Bilan['solde_credit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr style="font-weight:bold; border-top:1px solid #1B7B3D; background-color:#f0f0f0;">
+                                    <td colspan="2" style="padding:4px 8px;"><t t-esc="Gestion['label']"/></td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Gestion['mvt_debit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Gestion['mvt_credit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Gestion['solde_debit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="Gestion['solde_credit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr style="font-weight:bold; border-top:2px solid #145C2E; background-color:#1B7B3D; color:white;">
+                                    <td colspan="2" style="padding:4px 8px;"><t t-esc="GrandTotal['label']"/></td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="GrandTotal['mvt_debit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="GrandTotal['mvt_credit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="GrandTotal['solde_debit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                    <td class="text-end" style="padding:4px;">
+                                        <span t-esc="GrandTotal['solde_credit']" t-options="{'widget':'monetary','display_currency':env.company.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>

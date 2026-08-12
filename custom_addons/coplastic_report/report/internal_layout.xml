@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="coplastic_internal_layout" inherit_id="web.internal_layout" name="Coplastic Internal Layout">
+
+        <!-- En-tête avec logo Coplastic -->
+        <xpath expr="//div[hasclass('header')]" position="replace">
+            <div class="header" style="border-bottom: 2px solid #1B7B3D;">
+                <div class="row align-items-center" style="margin: 0;">
+                    <div class="col-3" style="font-size: 8px; color: #555;">
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                    </div>
+                    <div class="col-6 text-center">
+                        <t t-if="company.logo">
+                            <img t-att-src="image_data_uri(company.logo)"
+                                 style="max-height: 45px; max-width: 160px; object-fit: contain;"/>
+                        </t>
+                        <t t-else="">
+                            <strong style="font-size: 14px; color: #1B7B3D;" t-esc="company.name"/>
+                        </t>
+                    </div>
+                    <div class="col-3 text-end" style="font-size: 8px; color: #555;">
+                        <ul class="list-inline mb0">
+                            <li class="list-inline-item"><span class="page"/></li>
+                            <li class="list-inline-item">/</li>
+                            <li class="list-inline-item"><span class="topage"/></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- Margin-top sur le contenu principal -->
+        <xpath expr="//div[hasclass('article')]" position="attributes">
+            <attribute name="style">margin-top: 10px;</attribute>
+        </xpath>
+
+        <!-- Footer Coplastic après l'article -->
+        <xpath expr="//div[hasclass('article')]" position="after">
+            <div class="footer">
+                <t t-call="coplastic_report.coplastic_footer_content"/>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>

@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_delivery_visa" inherit_id="stock.report_delivery_document">
-        <!-- Donner un contexte positionné à la page (min-height < 237mm disponible sur A4) -->
-        <xpath expr="//div[@class='page']" position="attributes">
-            <attribute name="style">position: relative; min-height: 200mm;</attribute>
-        </xpath>
-        <!-- Bloc visa ancré en bas via position absolute -->
+        <!--
+            Bloc visa dans le flux normal du document.
+            Ancien comportement (position: absolute; bottom) : quand la liste
+            produits etait longue, elle debordait et le bloc Visa (ancre en bas
+            du conteneur .page) se superposait aux dernieres lignes, sans jamais
+            passer en 2e page. En flux normal, le contenu pagine naturellement
+            sur plusieurs pages et le bloc Visa se place apres le total.
+            page-break-inside: avoid evite qu'un cadre soit coupe entre 2 pages.
+        -->
         <xpath expr="//div[@name='signature']" position="after">
-            <div style="position: absolute; bottom: 5mm; left: 0; right: 0; page-break-inside: avoid; page-break-before: avoid;">
+            <div style="margin-top: 15mm; page-break-inside: avoid;">
                 <div style="display: table; width: 100%;">
                     <div style="display: table-cell; width: 45%; border: 1px solid #333; height: 90px; padding: 8px;">
                         <strong>Visa Direction</strong>

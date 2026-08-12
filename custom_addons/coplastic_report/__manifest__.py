@@ -17,11 +17,15 @@
     'version': '17.0.1.0.0',
     'license': 'LGPL-3',
 
-    'depends': ['web', 'stock'],
+    'depends': ['web', 'stock', 'base_accounting_kit'],
 
     'data': [
+        'security/ir.model.access.csv',
         'report/report_templates.xml',
         'report/stock_report_visa.xml',
+        'report/trial_balance.xml',
+        'report/balance_tiers.xml',
+        'report/internal_layout.xml',
     ],
 
     'assets': {
