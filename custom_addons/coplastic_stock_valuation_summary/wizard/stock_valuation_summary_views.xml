@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_valuation_summary_wizard_form" model="ir.ui.view">
+        <field name="name">stock.valuation.summary.wizard.form</field>
+        <field name="model">stock.valuation.summary.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Valorisation résumée du stock">
+                <group>
+                    <field name="methode"/>
+                    <field name="date_to" invisible="methode != 'cumul'"
+                           required="methode == 'cumul'"/>
+                    <field name="perimetre"/>
+                    <field name="include_zero"/>
+                </group>
+                <p class="text-muted">
+                    Génère un fichier Excel avec une seule ligne par produit
+                    (quantité et valeur), sans le détail des entrées/sorties.
+                    <br/>
+                    • <b>Stock restant actuel</b> : la valeur du stock encore
+                    présent aujourd'hui.<br/>
+                    • <b>Cumul des mouvements</b> : additionne les entrées/sorties
+                    jusqu'à la date choisie (valeur comptable à cette date).
+                </p>
+                <footer>
+                    <button name="action_print_xlsx" type="object"
+                            string="Générer l'Excel" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stock_valuation_summary_wizard" model="ir.actions.act_window">
+        <field name="name">Valorisation résumée (XLSX)</field>
+        <field name="res_model">stock.valuation.summary.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_stock_valuation_summary"
+              name="Valorisation résumée (XLSX)"
+              parent="stock.menu_warehouse_report"
+              action="action_stock_valuation_summary_wizard"
+              sequence="90"/>
+</odoo>

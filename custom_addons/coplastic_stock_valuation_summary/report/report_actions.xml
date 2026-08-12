@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_stock_valuation_summary_xlsx" model="ir.actions.report">
+        <field name="name">Valorisation résumée</field>
+        <field name="model">stock.valuation.summary.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">coplastic_stock_valuation_summary.summary_xlsx</field>
+        <field name="report_file">coplastic_stock_valuation_summary.summary_xlsx</field>
+        <field name="attachment_use" eval="False"/>
+    </record>
+</odoo>
