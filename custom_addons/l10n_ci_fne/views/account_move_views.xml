@@ -17,6 +17,13 @@
                         class="btn-warning"
                         invisible="fne_certified or state != 'posted' or move_type not in ('out_invoice', 'out_refund')"
                         groups="account.group_account_invoice"/>
+                <!-- Impression au format normalisé DGI -->
+                <button name="action_fne_print_invoice"
+                        string="Imprimer facture FNE"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not fne_certified or move_type not in ('out_invoice', 'out_refund')"
+                        groups="account.group_account_invoice"/>
                 <!-- Bouton annuler simulation (facture certifiée en simulation) -->
                 <button name="action_fne_reset_simulation"
                         string="Annuler simulation FNE"
@@ -71,12 +78,27 @@
                             <field name="fne_balance_sticker"/>
                         </group>
                         <group string="QR Code de vérification">
+                            <field name="fne_payment_method"/>
                             <field name="fne_qr_code" widget="image"
                                    class="oe_avatar"
                                    invisible="not fne_qr_code"/>
                             <field name="fne_token" widget="url"
                                    invisible="not fne_token"/>
                         </group>
+                    </group>
+                    <group string="Facture extournée"
+                           invisible="move_type != 'out_refund'">
+                        <field name="fne_origin_invoice"/>
+                        <field name="fne_origin_reference"/>
+                    </group>
+                    <group string="Rattachement à un reçu normalisé (RNE)"
+                           help="À renseigner quand le client a d'abord reçu un ticket de caisse normalisé et réclame ensuite une facture.">
+                        <field name="fne_is_rne" readonly="fne_certified"/>
+                        <field name="fne_rne_number"
+                               invisible="not fne_is_rne"
+                               required="fne_is_rne"
+                               readonly="fne_certified"
+                               placeholder="N° du reçu remis au client"/>
                     </group>
                     <group invisible="not fne_error_message">
                         <field name="fne_error_message"
@@ -85,6 +107,13 @@
                     </group>
                     <field name="fne_invoice_id" invisible="1"/>
                 </page>
+            </xpath>
+
+            <!-- Facture extournée, visible sans ouvrir l'onglet FNE -->
+            <xpath expr="//field[@name='payment_reference']" position="before">
+                <field name="fne_origin_invoice"
+                       invisible="not fne_origin_invoice"
+                       readonly="1"/>
             </xpath>
 
         </field>
